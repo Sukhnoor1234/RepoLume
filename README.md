@@ -10,8 +10,8 @@ ask questions that are answered with evidence from the source code.
 ## Project status
 
 RepoLume is under active development. The repository currently contains the
-project foundation, architecture decisions, and the first web interface. The
-repository-analysis features are not yet available.
+project foundation, architecture decisions, the first web interface, and the
+initial HTTP API. The repository-analysis features are not yet available.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -75,6 +75,19 @@ npm run dev
 ```
 
 The repository input is intentionally disabled until the ingestion milestone.
+
+## Run the API
+
+The API foundation lives in `apps/api` and requires Python 3.12.
+
+```bash
+cd apps/api
+python -m venv .venv
+python -m pip install -e ".[dev]"
+python -m uvicorn repolume_api.main:app --reload
+```
+
+The current API exposes only service health and generated documentation.
 
 ## Development workflow
 
