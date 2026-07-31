@@ -1,11 +1,38 @@
 # Repository analysis API contract
 
-- **Status:** Proposed
+- **Status:** Preflight implemented; analysis submission proposed
 - **Version:** v1
 
 This document defines the planned HTTP boundary for starting and inspecting a
-repository analysis. The endpoints are not implemented in the API foundation
-checkpoint.
+repository analysis.
+
+## Preflight a repository
+
+`POST /v1/repositories/preflight`
+
+```json
+{
+  "repository_url": "https://github.com/owner/repository.git",
+  "ref": "main"
+}
+```
+
+A valid request returns `200 OK` with a normalized reference:
+
+```json
+{
+  "provider": "github",
+  "owner": "owner",
+  "repository": "repository",
+  "canonical_url": "https://github.com/owner/repository",
+  "ref": "main"
+}
+```
+
+Preflight is local syntax validation only. It does not contact GitHub or prove
+that the repository exists, is public, or is accessible. The security boundary
+and requirements for future retrieval are documented in
+[repository intake security](../security/repository-intake.md).
 
 ## Submit an analysis
 
@@ -27,9 +54,9 @@ A valid request will eventually return `202 Accepted`:
 }
 ```
 
-The first implementation will accept only public GitHub repository URLs over
-HTTPS. URL validation, redirects, clone limits, archive limits, and network
-isolation must be implemented before this endpoint is enabled.
+The first implementation will accept only public GitHub repositories. Redirect
+controls, download limits, archive limits, and network isolation must be
+implemented before this endpoint is enabled.
 
 ## Inspect an analysis
 
@@ -59,11 +86,19 @@ Errors use one stable top-level shape:
 Messages are safe for users. Sensitive exception details, credentials, source
 contents, and internal network information must never be included.
 
+Preflight failures use one of these machine-readable codes:
+
+- `repository_url_invalid`
+- `repository_host_not_supported`
+- `repository_path_invalid`
+- `repository_ref_invalid`
+- `validation_error` for an invalid request body
+
 ## Deferred decisions
 
 - Authentication and ownership
 - Idempotency and duplicate submissions
-- Rate limits and repository size limits
+- Rate limits and final repository size limits
 - Progress reporting and cancellation
 - Retention and deletion
 - Callback or streaming behavior

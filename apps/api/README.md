@@ -4,10 +4,11 @@ This directory contains the HTTP API for RepoLume.
 
 ## Current milestone
 
-The API currently exposes service health, generated OpenAPI documentation, and
-consistent framework error responses. Repository ingestion, persistence,
-background jobs, authentication, and AI features are intentionally not
-implemented yet.
+The API currently exposes service health, generated OpenAPI documentation,
+consistent error responses, and a repository preflight endpoint. Preflight
+validates and normalizes a GitHub repository reference without making a
+network request. Repository download, persistence, background jobs,
+authentication, and AI features are intentionally not implemented yet.
 
 The planned ingestion boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md).
@@ -37,6 +38,17 @@ python -m uvicorn repolume_api.main:app --reload
 
 The health endpoint is available at `http://127.0.0.1:8000/health` and the
 interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+
+Validate a repository reference:
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/repositories/preflight \
+  -H "Content-Type: application/json" \
+  -d '{"repository_url":"https://github.com/octocat/Hello-World","ref":"main"}'
+```
+
+This only checks the submitted format. It does not prove that the repository
+exists, is public, or can be downloaded.
 
 ## Quality checks
 
