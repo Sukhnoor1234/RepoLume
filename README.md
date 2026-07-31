@@ -11,7 +11,8 @@ ask questions that are answered with evidence from the source code.
 
 RepoLume is under active development. The repository currently contains the
 project foundation, architecture decisions, the first web interface, and the
-initial HTTP API. The repository-analysis features are not yet available.
+initial API and worker boundaries. The repository-analysis features are not
+yet available.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -83,11 +84,37 @@ The API foundation lives in `apps/api` and requires Python 3.12.
 ```bash
 cd apps/api
 python -m venv .venv
+```
+
+Activate `.venv` with `source .venv/bin/activate` on macOS/Linux or
+`.venv\Scripts\Activate.ps1` in Windows PowerShell, then run:
+
+```bash
 python -m pip install -e ".[dev]"
 python -m uvicorn repolume_api.main:app --reload
 ```
 
 The current API exposes only service health and generated documentation.
+
+## Run the worker
+
+The analysis-worker foundation lives in `apps/worker` and requires Python 3.12.
+
+```bash
+cd apps/worker
+python -m venv .venv
+```
+
+Activate `.venv` with `source .venv/bin/activate` on macOS/Linux or
+`.venv\Scripts\Activate.ps1` in Windows PowerShell, then run:
+
+```bash
+python -m pip install -e ".[dev]"
+python -m repolume_worker --check
+```
+
+The current command validates configuration and reports that no queue is
+configured; it does not process repositories yet.
 
 ## Development workflow
 

@@ -40,6 +40,9 @@ and `failed`. A completed response will link to architecture data through
 separate endpoints rather than embedding the complete graph in this status
 response.
 
+The allowed transitions are documented in the
+[analysis worker lifecycle](../worker/lifecycle.md).
+
 ## Error envelope
 
 Errors use one stable top-level shape:
