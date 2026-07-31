@@ -14,11 +14,17 @@ The planned ingestion boundary is documented in the
 
 ## Local setup
 
-Create and activate a Python 3.12 virtual environment, then install the
-application with its development tools:
+Create a Python 3.12 virtual environment:
 
 ```bash
 python -m venv .venv
+```
+
+Activate `.venv` with `source .venv/bin/activate` on macOS/Linux or
+`.venv\Scripts\Activate.ps1` in Windows PowerShell. Then install the application
+with its development tools:
+
+```bash
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
