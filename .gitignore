@@ -21,10 +21,12 @@ build/
 __pycache__/
 *.py[cod]
 *.pyo
+*.egg-info/
 .python-version
 .venv/
 venv/
 .pytest_cache/
+pytest-cache-files-*/
 .mypy_cache/
 .ruff_cache/
 .coverage
