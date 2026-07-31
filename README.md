@@ -10,8 +10,8 @@ ask questions that are answered with evidence from the source code.
 ## Project status
 
 RepoLume is under active development. The repository currently contains the
-project foundation and architecture decisions; the product is not yet
-available for use.
+project foundation, architecture decisions, and the first web interface. The
+repository-analysis features are not yet available.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -63,6 +63,18 @@ the product develops.
 RepoLume will use a monorepo containing independently deployable web, API, and
 analysis-worker applications. The decision and its tradeoffs are recorded in
 [ADR 0001](docs/decisions/0001-monorepo-architecture.md).
+
+## Run the web application
+
+The current web foundation lives in `apps/web`.
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
+The repository input is intentionally disabled until the ingestion milestone.
 
 ## Development workflow
 
