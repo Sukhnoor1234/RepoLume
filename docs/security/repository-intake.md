@@ -1,11 +1,12 @@
 # Repository intake security boundary
 
-RepoLume treats every repository reference and every future repository archive
-as untrusted input. The current checkpoint implements local preflight validation
-only. It does not contact GitHub, confirm that a repository exists or is public,
-download an archive, clone Git history, or execute repository code.
+RepoLume treats every repository reference and repository archive as untrusted
+input. The API performs local preflight validation, and the worker can retrieve
+a bounded public GitHub snapshot through a separate security boundary. These
+capabilities are not connected to an analysis submission endpoint or queue, and
+repository code is never executed.
 
-## Current controls
+## API preflight controls
 
 The API accepts only:
 
@@ -22,29 +23,34 @@ Validation is intentionally stricter than every value Git may technically
 accept. Supporting an unusual name later should be an explicit design decision,
 not an accidental expansion of the network boundary.
 
-## Requirements for the download checkpoint
+## Worker retrieval controls
 
-Future retrieval must:
+The worker retrieval implementation:
 
-1. Build requests from the normalized owner, repository, and ref rather than
-   requesting the submitted URL.
-2. Resolve a branch or tag to a commit ID and store that immutable ID with the
-   analysis.
-3. Disable automatic redirects. Validate every redirect target against a small,
-   documented GitHub archive-host allowlist before following it.
-4. Use outbound network allowlists, short connection and response timeouts, and
-   bounded response streaming.
-5. Reject archives that exceed the compressed-size, expanded-size, file-count,
-   or path-depth limits.
-6. Extract into an isolated temporary directory while rejecting absolute paths,
-   parent traversal, links, devices, and other special files.
-7. Analyze files as data. Never run repository scripts, hooks, builds, package
-   managers, or imported code.
-8. Delete temporary source data after the retention window, including failed
-   and cancelled analyses.
+- constructs requests from normalized coordinates instead of the submitted URL
+- verifies that the repository is public and resolves the selected ref to an
+  immutable 40-character commit SHA
+- disables automatic redirects and accepts only the expected HTTPS archive path
+  on `codeload.github.com`
+- ignores inherited proxy and credential configuration, uses explicit timeouts,
+  and streams archives through compressed-size limits
+- inspects every archive entry before extraction and enforces expanded size,
+  single-file, entry-count, path-depth, and path-length limits
+- rejects traversal, absolute paths, links, special files, collisions, corrupt
+  archives, and unsupported cross-platform paths
+- removes the compressed archive after extraction and removes the isolated
+  source directory whenever processing exits
+- never runs repository scripts, hooks, builds, package managers, or imports
 
-Initial limits will be selected and tested during the retrieval checkpoint.
-Until those controls exist, repository download endpoints must remain disabled.
+The complete limits and failure behavior are documented in
+[repository retrieval](../worker/repository-retrieval.md).
+
+## Remaining deployment controls
+
+Before analysis submission is enabled, RepoLume still needs authenticated job
+ownership, queue delivery, persistence and retention records, and a
+container-level outbound network policy. Static analysis will consume the
+retrieved directory only while its cleanup context is active.
 
 ## Ref validation
 
