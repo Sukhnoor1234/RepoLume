@@ -1,8 +1,9 @@
 # Analysis worker lifecycle
 
-This document defines the first job-state contract shared by the planned API
-submission flow and the analysis worker. It describes lifecycle rules only;
-queue delivery and repository processing are not implemented yet.
+This document defines the job-state contract shared by the planned API
+submission flow and analysis worker. Repository retrieval is implemented as an
+isolated worker capability, but queue delivery and complete job processing are
+not connected yet.
 
 ```mermaid
 stateDiagram-v2
@@ -43,4 +44,4 @@ stateDiagram-v2
 - Lease duration and abandoned-job recovery
 - Cancellation
 - Progress events
-- Failure-code taxonomy
+- Persistence of safe retrieval and analysis failure codes

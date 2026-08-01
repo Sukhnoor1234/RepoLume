@@ -4,12 +4,15 @@ This directory contains the asynchronous analysis-worker boundary for RepoLume.
 
 ## Current milestone
 
-The worker currently validates its runtime configuration, reports readiness,
-and enforces the planned analysis-job lifecycle. It does not connect to a
-queue, clone repositories, parse source code, or persist results yet.
+The worker validates runtime configuration, enforces the analysis-job
+lifecycle, and can safely retrieve an isolated snapshot of a public GitHub
+repository. Retrieval is not connected to a queue or API submission yet, and
+the worker does not parse source code or persist results.
 
 The state rules are documented in the
-[analysis worker lifecycle](../../docs/worker/lifecycle.md).
+[analysis worker lifecycle](../../docs/worker/lifecycle.md). The network, archive,
+resource, and cleanup boundaries are documented in
+[repository retrieval](../../docs/worker/repository-retrieval.md).
 
 ## Local setup
 

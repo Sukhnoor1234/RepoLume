@@ -54,9 +54,10 @@ A valid request will eventually return `202 Accepted`:
 }
 ```
 
-The first implementation will accept only public GitHub repositories. Redirect
-controls, download limits, archive limits, and network isolation must be
-implemented before this endpoint is enabled.
+The worker now implements commit-pinned public GitHub retrieval, redirect
+validation, bounded streaming, archive inspection, safe extraction, and
+temporary cleanup. This endpoint remains disabled until queue delivery,
+ownership, and persistence are implemented.
 
 ## Inspect an analysis
 

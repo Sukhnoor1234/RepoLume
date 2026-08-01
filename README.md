@@ -9,10 +9,10 @@ ask questions that are answered with evidence from the source code.
 
 ## Project status
 
-RepoLume is under active development. The repository currently contains the
-project foundation, architecture decisions, the first web interface, and the
-initial API and worker boundaries. The repository-analysis features are not
-yet available.
+RepoLume is under active development. The repository contains the project
+foundation, the first web interface, API preflight validation, and a bounded
+worker capability for retrieving public GitHub snapshots. Static analysis and
+the end-to-end repository-analysis workflow are not available yet.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -94,7 +94,7 @@ python -m pip install -e ".[dev]"
 python -m uvicorn repolume_api.main:app --reload
 ```
 
-The current API exposes only service health and generated documentation.
+The API exposes service health, repository preflight, and generated documentation.
 
 ## Run the worker
 
@@ -114,7 +114,8 @@ python -m repolume_worker --check
 ```
 
 The current command validates configuration and reports that no queue is
-configured; it does not process repositories yet.
+configured. Secure retrieval is available as an internal worker capability, but
+complete repository jobs are not connected yet.
 
 ## Development workflow
 
