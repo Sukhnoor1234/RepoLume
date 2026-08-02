@@ -11,8 +11,9 @@ ask questions that are answered with evidence from the source code.
 
 RepoLume is under active development. The repository contains the project
 foundation, the first web interface, API preflight validation, and a bounded
-worker capability for retrieving public GitHub snapshots. Static analysis and
-the end-to-end repository-analysis workflow are not available yet.
+worker capability for retrieving public GitHub snapshots. The first
+deterministic Python static analyzer is also available inside the worker. The
+end-to-end repository-analysis workflow is not connected yet.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -51,7 +52,7 @@ confirmed by static analysis.
 | Web | Next.js, React, TypeScript, Tailwind CSS |
 | Visualization | React Flow, ELK, Mermaid |
 | API | Python, FastAPI |
-| Analysis | Tree-sitter with language-specific resolvers |
+| Analysis | Python AST, Tree-sitter, language-specific resolvers |
 | Data | PostgreSQL, pgvector, Redis |
 | AI | Retrieval-augmented generation, embeddings, LLM provider adapter |
 | Delivery | Docker, GitHub Actions, managed cloud services |
@@ -114,8 +115,9 @@ python -m repolume_worker --check
 ```
 
 The current command validates configuration and reports that no queue is
-configured. Secure retrieval is available as an internal worker capability, but
-complete repository jobs are not connected yet.
+configured. Secure retrieval and deterministic Python static analysis are
+available as internal worker capabilities, but complete repository jobs are not
+connected yet.
 
 ## Development workflow
 
