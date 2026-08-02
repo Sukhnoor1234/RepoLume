@@ -16,7 +16,7 @@ flowchart LR
     E --> F["Stream bounded tarball"]
     F --> G["Inspect every archive entry"]
     G --> H["Extract regular files into temporary storage"]
-    H --> I["Static analysis (future checkpoint)"]
+    H --> I["Bounded static analysis"]
     I --> J["Always remove temporary source"]
 ```
 
@@ -85,4 +85,4 @@ failures without including response bodies or source contents.
 - Queue delivery and worker claims
 - Database persistence and retention records
 - Container-level outbound network policy
-- Static analysis and architecture artifact generation
+- Multi-language architecture artifact composition

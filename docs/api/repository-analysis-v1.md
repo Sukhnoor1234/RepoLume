@@ -56,7 +56,8 @@ A valid request will eventually return `202 Accepted`:
 
 The worker now implements commit-pinned public GitHub retrieval, redirect
 validation, bounded streaming, archive inspection, safe extraction, and
-temporary cleanup. This endpoint remains disabled until queue delivery,
+temporary cleanup. It can produce a versioned Python static-analysis artifact
+from the isolated source. This endpoint remains disabled until queue delivery,
 ownership, and persistence are implemented.
 
 ## Inspect an analysis

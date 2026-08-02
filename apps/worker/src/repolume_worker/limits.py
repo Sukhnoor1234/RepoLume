@@ -1,4 +1,4 @@
-"""Resource limits for untrusted repository archives."""
+"""Resource limits for untrusted repository archives and source analysis."""
 
 from dataclasses import dataclass
 
@@ -23,3 +23,22 @@ class RetrievalLimits:
 
         if self.max_single_file_bytes > self.max_expanded_bytes:
             raise ValueError("max_single_file_bytes cannot exceed max_expanded_bytes")
+
+
+@dataclass(frozen=True, slots=True)
+class AnalysisLimits:
+    """Limits applied while reading untrusted Python source as data."""
+
+    max_python_files: int = 5_000
+    max_total_source_bytes: int = 50 * MEBIBYTE
+    max_single_source_bytes: int = 2 * MEBIBYTE
+    max_path_depth: int = 50
+    max_path_length: int = 512
+
+    def __post_init__(self) -> None:
+        for field_name in self.__dataclass_fields__:
+            if getattr(self, field_name) <= 0:
+                raise ValueError(f"{field_name} must be greater than zero")
+
+        if self.max_single_source_bytes > self.max_total_source_bytes:
+            raise ValueError("max_single_source_bytes cannot exceed max_total_source_bytes")
