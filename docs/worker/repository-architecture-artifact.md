@@ -111,5 +111,5 @@ Checkpoint 9 does not include:
 - architecture scoring or design recommendations
 - persistence, API submission, UI visualization, or AI features
 
-The artifact is an internal worker capability until the analysis pipeline and
-storage boundaries are implemented.
+The artifact is now returned by the internal analysis pipeline. Queue delivery,
+API access, and storage remain deferred.

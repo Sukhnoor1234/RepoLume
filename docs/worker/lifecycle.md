@@ -1,10 +1,10 @@
 # Analysis worker lifecycle
 
 This document defines the job-state contract shared by the planned API
-submission flow and analysis worker. Repository retrieval, source analysis,
-and language-neutral architecture composition are implemented as isolated
-worker capabilities, but queue delivery and complete job processing are not
-connected yet.
+submission flow and analysis worker. An internal pipeline now connects
+repository retrieval, source analysis, architecture composition, lifecycle
+history, and cleanup for one directly supplied job. Queue delivery and
+persistent job processing are not connected yet.
 
 ```mermaid
 stateDiagram-v2

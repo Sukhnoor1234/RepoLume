@@ -52,9 +52,10 @@ ownership, queue delivery, persistence and retention records, and a
 container-level outbound network policy. The source analyzers read the
 retrieved directory only while its cleanup context is active. Python uses the
 standard-library AST, while TypeScript and JavaScript use Tree-sitter grammars.
-Both parse source as data and do not
-import modules, execute code, install repository packages, or inspect the host
-environment.
+Both parse source as data and do not import modules, execute code, install
+repository packages, or inspect the host environment. The analysis pipeline
+keeps both analyzers and architecture composition inside the retrieval context,
+and records completion only after temporary cleanup succeeds.
 
 ## Ref validation
 
