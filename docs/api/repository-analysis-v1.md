@@ -58,8 +58,9 @@ The worker now implements commit-pinned public GitHub retrieval, redirect
 validation, bounded streaming, archive inspection, safe extraction, and
 temporary cleanup. It can produce versioned Python and TypeScript/JavaScript
 analysis artifacts and compose them into one language-neutral repository
-architecture graph. This endpoint remains disabled until queue delivery,
-ownership, and persistence are implemented.
+architecture graph. An internal pipeline coordinates that complete run and
+returns only after temporary cleanup succeeds. This endpoint remains disabled
+until queue delivery, ownership, and persistence are implemented.
 
 ## Inspect an analysis
 

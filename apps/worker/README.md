@@ -6,9 +6,9 @@ This directory contains the asynchronous analysis-worker boundary for RepoLume.
 
 The worker validates runtime configuration, enforces the analysis-job
 lifecycle, and can safely retrieve an isolated snapshot of a public GitHub
-repository. It can turn Python, TypeScript, and JavaScript source into
-deterministic analysis artifacts and compose them into one language-neutral
-repository graph without executing repository code. These capabilities are not
+repository. Its internal pipeline connects retrieval, Python and
+TypeScript/JavaScript analysis, language-neutral architecture composition, and
+temporary cleanup without executing repository code. The pipeline is not
 connected to a queue or API submission yet, and the worker does not persist
 results.
 
@@ -21,6 +21,8 @@ confidence, and parser boundaries are documented in
 [TypeScript and JavaScript static analysis](../../docs/worker/typescript-static-analysis.md),
 and the
 [repository architecture artifact](../../docs/worker/repository-architecture-artifact.md).
+The complete orchestration and result boundary is documented in the
+[repository analysis pipeline](../../docs/worker/analysis-pipeline.md).
 
 ## Local setup
 
