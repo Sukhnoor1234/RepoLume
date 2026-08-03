@@ -4,11 +4,12 @@ This directory contains the HTTP API for RepoLume.
 
 ## Current milestone
 
-The API currently exposes service health, generated OpenAPI documentation,
-consistent error responses, and a repository preflight endpoint. Preflight
-validates and normalizes a GitHub repository reference without making a
-network request. Repository download, persistence, background jobs,
-authentication, and AI features are intentionally not implemented yet.
+The API exposes service health, generated OpenAPI documentation, consistent
+error responses, repository preflight, and versioned analysis job routes.
+Submission, lifecycle inspection, and architecture retrieval use an injected
+job-service boundary. The default adapter returns a safe `503` until durable
+queue and persistence integrations are configured. Repository analysis never
+runs inside the API request process.
 
 The planned ingestion boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md).
@@ -49,6 +50,18 @@ curl -X POST http://127.0.0.1:8000/v1/repositories/preflight \
 
 This only checks the submitted format. It does not prove that the repository
 exists, is public, or can be downloaded.
+
+Submit an analysis through a configured job service:
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/analyses \
+  -H "Content-Type: application/json" \
+  -d '{"repository_url":"https://github.com/octocat/Hello-World","ref":"main"}'
+```
+
+A local API started without a durable job adapter intentionally returns
+`503 analysis_service_unavailable` for analysis routes. Preflight remains
+available because it performs only local validation.
 
 ## Quality checks
 

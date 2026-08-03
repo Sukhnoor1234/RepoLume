@@ -1,10 +1,10 @@
 # Analysis worker lifecycle
 
-This document defines the job-state contract shared by the planned API
-submission flow and analysis worker. An internal pipeline now connects
-repository retrieval, source analysis, architecture composition, lifecycle
-history, and cleanup for one directly supplied job. Queue delivery and
-persistent job processing are not connected yet.
+This document defines the job-state contract shared by the analysis API and
+worker. The API now exposes submission and status shapes through an injected
+job-service boundary. The worker pipeline connects repository retrieval, source
+analysis, architecture composition, lifecycle history, and cleanup. Durable
+queue delivery and persistent job processing are not connected yet.
 
 ```mermaid
 stateDiagram-v2

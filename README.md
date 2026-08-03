@@ -10,11 +10,10 @@ ask questions that are answered with evidence from the source code.
 ## Project status
 
 RepoLume is under active development. The repository contains the project
-foundation, the first web interface, API preflight validation, and a bounded
-worker capability for retrieving public GitHub snapshots. An internal
-end-to-end pipeline now connects secure retrieval, deterministic Python and
-TypeScript/JavaScript analysis, architecture composition, and temporary
-cleanup. API submission, queue delivery, and persistence are not connected yet.
+foundation, the first web interface, repository intake and analysis API
+contracts, and a bounded worker pipeline for public GitHub snapshots. The API
+now defines submission, lifecycle inspection, and architecture result routes,
+while failing safely until durable queue and persistence adapters are connected.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
