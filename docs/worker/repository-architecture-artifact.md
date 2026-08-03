@@ -111,5 +111,6 @@ Checkpoint 9 does not include:
 - architecture scoring or design recommendations
 - persistence, API submission, UI visualization, or AI features
 
-The artifact is now returned by the internal analysis pipeline. Queue delivery,
-API access, and storage remain deferred.
+The artifact is returned by the internal analysis pipeline and has a validated
+API response schema. Queue delivery and durable storage remain deferred, so no
+production adapter can expose a completed artifact yet.

@@ -1,10 +1,14 @@
 # Repository analysis API contract
 
-- **Status:** Preflight implemented; analysis submission proposed
+- **Status:** HTTP boundary implemented; durable job adapter pending
 - **Version:** v1
+- **Checkpoint:** 11
 
-This document defines the planned HTTP boundary for starting and inspecting a
-repository analysis.
+This document defines the HTTP boundary for submitting, inspecting, and reading
+the architecture result of a repository analysis. The routes are implemented
+against an injected job-service interface. The default application does not
+pretend to queue work: it returns a safe `503 Service Unavailable` until a real
+queue and persistence adapter is configured.
 
 ## Preflight a repository
 
@@ -31,7 +35,7 @@ A valid request returns `200 OK` with a normalized reference:
 
 Preflight is local syntax validation only. It does not contact GitHub or prove
 that the repository exists, is public, or is accessible. The security boundary
-and requirements for future retrieval are documented in
+is documented in
 [repository intake security](../security/repository-intake.md).
 
 ## Submit an analysis
@@ -45,34 +49,69 @@ and requirements for future retrieval are documented in
 }
 ```
 
-A valid request will eventually return `202 Accepted`:
+A configured job service returns `202 Accepted` only after it accepts the
+normalized repository reference:
 
 ```json
 {
-  "analysis_id": "01JEXAMPLE0000000000000000",
+  "analysis_id": "analysis_01JEXAMPLE",
   "status": "queued"
 }
 ```
 
-The worker now implements commit-pinned public GitHub retrieval, redirect
-validation, bounded streaming, archive inspection, safe extraction, and
-temporary cleanup. It can produce versioned Python and TypeScript/JavaScript
-analysis artifacts and compose them into one language-neutral repository
-architecture graph. An internal pipeline coordinates that complete run and
-returns only after temporary cleanup succeeds. This endpoint remains disabled
-until queue delivery, ownership, and persistence are implemented.
+Without a configured adapter, the route returns:
+
+```json
+{
+  "error": {
+    "code": "analysis_service_unavailable",
+    "message": "Repository analysis is temporarily unavailable."
+  }
+}
+```
+
+The API does not run retrieval or static analysis in the request process. A
+later adapter will persist the initial job and publish it for the worker.
 
 ## Inspect an analysis
 
 `GET /v1/analyses/{analysis_id}`
 
-The planned lifecycle states are `queued`, `cloning`, `analyzing`, `completed`,
-and `failed`. A completed response will link to architecture data through
-separate endpoints rather than embedding the complete graph in this status
-response.
+The response contains lifecycle state and normalized repository identity, but
+not the complete graph:
 
-The allowed transitions are documented in the
-[analysis worker lifecycle](../worker/lifecycle.md).
+```json
+{
+  "analysis_id": "analysis_01JEXAMPLE",
+  "status": "analyzing",
+  "repository": {
+    "provider": "github",
+    "owner": "owner",
+    "repository": "repository",
+    "canonical_url": "https://github.com/owner/repository",
+    "ref": "main"
+  },
+  "result_available": false,
+  "failure": null
+}
+```
+
+The allowed states are `queued`, `cloning`, `analyzing`, `completed`, and
+`failed`. Failed jobs include only the safe failure code and message recorded by
+the worker. Unknown identifiers return `404 analysis_not_found`.
+
+## Read completed architecture
+
+`GET /v1/analyses/{analysis_id}/architecture`
+
+A completed job returns the versioned language-neutral artifact defined in
+[repository architecture artifact](../worker/repository-architecture-artifact.md).
+The HTTP schema includes languages, nodes, edges, diagnostics, and summary
+counts. Repository-relative source locations remain attached as evidence.
+
+Active or failed jobs return `409 analysis_not_completed`. The status response
+must report `result_available: true` only for a completed job whose architecture
+can be read.
 
 ## Error envelope
 
@@ -81,8 +120,8 @@ Errors use one stable top-level shape:
 ```json
 {
   "error": {
-    "code": "repository_not_supported",
-    "message": "The repository could not be analyzed."
+    "code": "analysis_not_found",
+    "message": "The requested analysis was not found."
   }
 }
 ```
@@ -90,19 +129,38 @@ Errors use one stable top-level shape:
 Messages are safe for users. Sensitive exception details, credentials, source
 contents, and internal network information must never be included.
 
-Preflight failures use one of these machine-readable codes:
+Repository input failures use:
 
 - `repository_url_invalid`
 - `repository_host_not_supported`
 - `repository_path_invalid`
 - `repository_ref_invalid`
-- `validation_error` for an invalid request body
+- `validation_error` for an invalid request body or path identifier
+
+Analysis boundary failures use:
+
+- `analysis_service_unavailable`
+- `analysis_not_found`
+- `analysis_not_completed`
+
+## Integration boundary
+
+The application factory accepts an `AnalysisJobService`. Its adapter must:
+
+- create a durable queued job and return its identifier
+- read current lifecycle state and safe terminal failure details
+- return a validated architecture artifact only after completion
+- map missing and incomplete jobs to the service exceptions defined by the API
+
+The default adapter fails closed. Tests use an isolated fake adapter and verify
+normalization, every response shape, stable error mapping, result gating, and
+the generated OpenAPI document.
 
 ## Deferred decisions
 
-- Authentication and ownership
+- PostgreSQL schema, migrations, and retention
+- Redis queue delivery, acknowledgement, retries, and abandoned-job recovery
+- Authentication, authorization, and job ownership
 - Idempotency and duplicate submissions
-- Rate limits and final repository size limits
-- Progress reporting and cancellation
-- Retention and deletion
-- Callback or streaming behavior
+- Rate limits
+- Progress streaming and cancellation

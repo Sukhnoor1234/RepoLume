@@ -9,8 +9,8 @@ lifecycle, and can safely retrieve an isolated snapshot of a public GitHub
 repository. Its internal pipeline connects retrieval, Python and
 TypeScript/JavaScript analysis, language-neutral architecture composition, and
 temporary cleanup without executing repository code. The pipeline is not
-connected to a queue or API submission yet, and the worker does not persist
-results.
+connected to the API job-service boundary or a durable queue yet, and the
+worker does not persist results.
 
 The state rules are documented in the
 [analysis worker lifecycle](../../docs/worker/lifecycle.md). The network, archive,

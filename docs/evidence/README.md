@@ -150,3 +150,29 @@ Result: 128 tests passed in 0.93 seconds.
 The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions remains the authoritative CI record after the
 branch is pushed.
+
+## Checkpoint 11
+
+Branch: `feature/analysis-api`
+
+Captured: August 3, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 71 tests passed in 1.05 seconds.
+
+![Checkpoint 11 API pytest results](checkpoint-11-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 128 tests passed in 0.77 seconds.
+
+![Checkpoint 11 worker pytest results](checkpoint-11-worker-pytest.png)
+
+The screenshots are documentation artifacts rendered from the exact output of
+fresh local runs. GitHub Actions remains the authoritative CI record after the
+branch is pushed.

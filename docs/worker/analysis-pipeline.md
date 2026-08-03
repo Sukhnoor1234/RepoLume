@@ -99,7 +99,7 @@ result construction, and safe cross-boundary failure behavior.
 
 Checkpoint 10 does not include:
 
-- an API analysis-submission endpoint
+- a durable adapter behind the implemented API analysis routes
 - queue delivery, claims, acknowledgements, or retries
 - database persistence, retention, or result retrieval
 - authentication, authorization, or job ownership

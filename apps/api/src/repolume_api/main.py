@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 
 from repolume_api import __version__
+from repolume_api.analyses import AnalysisJobService, UnavailableAnalysisJobService
 from repolume_api.config import Settings
 from repolume_api.errors import (
     APIError,
@@ -12,11 +13,16 @@ from repolume_api.errors import (
     handle_http_exception,
     handle_validation_error,
 )
+from repolume_api.routes.analyses import router as analyses_router
 from repolume_api.routes.health import router as health_router
 from repolume_api.routes.repositories import router as repositories_router
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    analysis_job_service: AnalysisJobService | None = None,
+) -> FastAPI:
     """Create an API instance with explicit runtime configuration."""
 
     app = FastAPI(
@@ -25,11 +31,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version=__version__,
     )
     app.state.settings = settings or Settings.from_environment()
+    app.state.analysis_job_service = analysis_job_service or UnavailableAnalysisJobService()
     app.add_exception_handler(APIError, handle_api_error)
     app.add_exception_handler(HTTPException, handle_http_exception)
     app.add_exception_handler(RequestValidationError, handle_validation_error)
     app.include_router(health_router)
     app.include_router(repositories_router)
+    app.include_router(analyses_router)
     return app
 
 
