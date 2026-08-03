@@ -20,11 +20,15 @@ class DependencyKind(StrEnum):
 
 
 class SymbolKind(StrEnum):
-    """Top-level Python declarations exposed by the first analyzer."""
+    """Top-level declarations exposed by the source analyzers."""
 
     FUNCTION = "function"
     ASYNC_FUNCTION = "async_function"
     CLASS = "class"
+    VARIABLE = "variable"
+    INTERFACE = "interface"
+    TYPE_ALIAS = "type_alias"
+    ENUM = "enum"
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,7 +64,7 @@ class PythonModule:
 
 @dataclass(frozen=True, slots=True)
 class Dependency:
-    """A directed import relationship originating in a Python module."""
+    """A directed import relationship originating in a source module."""
 
     source: str
     target: str
@@ -120,5 +124,40 @@ class PythonAnalysisArtifact:
 
     def to_json(self) -> str:
         """Serialize with stable ordering for snapshots and future persistence."""
+
+        return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"
+
+
+@dataclass(frozen=True, slots=True)
+class ScriptModule:
+    """A parsed TypeScript or JavaScript file and its declarations."""
+
+    name: str
+    path: str
+    language: str
+    source_bytes: int
+    line_count: int
+    symbols: tuple[Symbol, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class ScriptAnalysisArtifact:
+    """Deterministic TypeScript and JavaScript artifact."""
+
+    schema_version: str
+    language: str
+    modules: tuple[ScriptModule, ...]
+    dependencies: tuple[Dependency, ...]
+    entry_points: tuple[EntryPoint, ...]
+    diagnostics: tuple[AnalysisDiagnostic, ...]
+    summary: AnalysisSummary
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a JSON-compatible representation of the artifact."""
+
+        return asdict(self)
+
+    def to_json(self) -> str:
+        """Serialize with stable ordering for snapshots and persistence."""
 
         return json.dumps(self.to_dict(), indent=2, sort_keys=True) + "\n"

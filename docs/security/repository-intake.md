@@ -49,10 +49,12 @@ The complete limits and failure behavior are documented in
 
 Before analysis submission is enabled, RepoLume still needs authenticated job
 ownership, queue delivery, persistence and retention records, and a
-container-level outbound network policy. The Python analyzer reads the
-retrieved directory only while its cleanup context is active. It parses source
-as data and does not import modules, execute code, install packages, or inspect
-the host environment.
+container-level outbound network policy. The source analyzers read the
+retrieved directory only while its cleanup context is active. Python uses the
+standard-library AST, while TypeScript and JavaScript use Tree-sitter grammars.
+Both parse source as data and do not
+import modules, execute code, install repository packages, or inspect the host
+environment.
 
 ## Ref validation
 

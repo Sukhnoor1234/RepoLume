@@ -42,3 +42,22 @@ class AnalysisLimits:
 
         if self.max_single_source_bytes > self.max_total_source_bytes:
             raise ValueError("max_single_source_bytes cannot exceed max_total_source_bytes")
+
+
+@dataclass(frozen=True, slots=True)
+class ScriptAnalysisLimits:
+    """Limits applied while reading untrusted TypeScript and JavaScript."""
+
+    max_script_files: int = 5_000
+    max_total_source_bytes: int = 50 * MEBIBYTE
+    max_single_source_bytes: int = 2 * MEBIBYTE
+    max_path_depth: int = 50
+    max_path_length: int = 512
+
+    def __post_init__(self) -> None:
+        for field_name in self.__dataclass_fields__:
+            if getattr(self, field_name) <= 0:
+                raise ValueError(f"{field_name} must be greater than zero")
+
+        if self.max_single_source_bytes > self.max_total_source_bytes:
+            raise ValueError("max_single_source_bytes cannot exceed max_total_source_bytes")
