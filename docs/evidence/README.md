@@ -98,3 +98,29 @@ Result: 100 tests passed in 0.75 seconds.
 The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions remains the authoritative CI record after the
 branch is pushed.
+
+## Checkpoint 9
+
+Branch: `feature/architecture-artifact`
+
+Captured: August 3, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 55 tests passed in 0.75 seconds.
+
+![Checkpoint 9 API pytest results](checkpoint-09-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 117 tests passed in 0.81 seconds.
+
+![Checkpoint 9 worker pytest results](checkpoint-09-worker-pytest.png)
+
+The screenshots are documentation artifacts rendered from the exact output of
+fresh local runs. GitHub Actions remains the authoritative CI record after the
+branch is pushed.

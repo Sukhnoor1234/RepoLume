@@ -81,7 +81,7 @@ Checkpoint 8 intentionally does not include:
 - framework-specific routes and entry points
 - package export-map or bundler configuration resolution
 - call graphs, runtime reflection, or dead-code analysis
-- merging Python and script artifacts into one architecture graph
+- cross-language relationship inference across composed artifacts
 - queue delivery, persistence, API submission, UI, or AI features
 
 These boundaries keep the parser useful and testable before the product layers
