@@ -11,9 +11,9 @@ ask questions that are answered with evidence from the source code.
 
 RepoLume is under active development. The repository contains the project
 foundation, the first web interface, API preflight validation, and a bounded
-worker capability for retrieving public GitHub snapshots. The first
-deterministic Python static analyzer is also available inside the worker. The
-end-to-end repository-analysis workflow is not connected yet.
+worker capability for retrieving public GitHub snapshots. Deterministic Python
+and TypeScript/JavaScript static analyzers are also available inside the
+worker. The end-to-end repository-analysis workflow is not connected yet.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -115,9 +115,9 @@ python -m repolume_worker --check
 ```
 
 The current command validates configuration and reports that no queue is
-configured. Secure retrieval and deterministic Python static analysis are
-available as internal worker capabilities, but complete repository jobs are not
-connected yet.
+configured. Secure retrieval and deterministic Python and TypeScript/JavaScript
+static analysis are available as internal worker capabilities, but complete
+repository jobs are not connected yet.
 
 ## Development workflow
 

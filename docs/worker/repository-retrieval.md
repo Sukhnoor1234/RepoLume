@@ -85,4 +85,4 @@ failures without including response bodies or source contents.
 - Queue delivery and worker claims
 - Database persistence and retention records
 - Container-level outbound network policy
-- Multi-language architecture artifact composition
+- Combining per-language artifacts into one repository architecture graph

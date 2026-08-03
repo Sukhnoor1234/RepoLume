@@ -1,9 +1,10 @@
 # Analysis worker lifecycle
 
 This document defines the job-state contract shared by the planned API
-submission flow and analysis worker. Repository retrieval and Python static
-analysis are implemented as isolated worker capabilities, but queue delivery
-and complete job processing are not connected yet.
+submission flow and analysis worker. Repository retrieval plus Python and
+TypeScript/JavaScript static analysis are implemented as isolated worker
+capabilities, but queue delivery and complete job processing are not connected
+yet.
 
 ```mermaid
 stateDiagram-v2

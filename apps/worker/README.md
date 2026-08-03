@@ -6,17 +6,18 @@ This directory contains the asynchronous analysis-worker boundary for RepoLume.
 
 The worker validates runtime configuration, enforces the analysis-job
 lifecycle, and can safely retrieve an isolated snapshot of a public GitHub
-repository. It can also turn Python source into a deterministic module,
-dependency, symbol, and entry-point artifact without executing repository code.
-These capabilities are not connected to a queue or API submission yet, and the
-worker does not persist results.
+repository. It can also turn Python, TypeScript, and JavaScript source into
+deterministic module, dependency, symbol, and entry-point artifacts without
+executing repository code. These capabilities are not connected to a queue or
+API submission yet, and the worker does not persist results.
 
 The state rules are documented in the
 [analysis worker lifecycle](../../docs/worker/lifecycle.md). The network, archive,
 resource, and cleanup boundaries are documented in
 [repository retrieval](../../docs/worker/repository-retrieval.md). The artifact,
 confidence, and parser boundaries are documented in
-[Python static analysis](../../docs/worker/python-static-analysis.md).
+[Python static analysis](../../docs/worker/python-static-analysis.md) and
+[TypeScript and JavaScript static analysis](../../docs/worker/typescript-static-analysis.md).
 
 ## Local setup
 
