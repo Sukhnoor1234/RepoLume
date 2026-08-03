@@ -37,8 +37,8 @@ The version 1 script artifact contains:
 
 - repository-relative modules with language, byte count, line count, and
   top-level symbols
-- functions, async functions, classes, variables, interfaces, type aliases,
-  enums, and decorators
+- functions, async functions, classes (including abstract and ambient
+  declarations), variables, interfaces, type aliases, enums, and decorators
 - ES imports and re-exports, CommonJS `require`, and dynamic `import()`
   relationships
 - confirmed local dependencies and heuristic external-package dependencies

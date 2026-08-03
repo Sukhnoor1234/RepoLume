@@ -52,9 +52,11 @@ _IGNORED_DIRECTORIES = frozenset(
     }
 )
 _DECLARATION_TYPES = {
+    "abstract_class_declaration": SymbolKind.CLASS,
     "class_declaration": SymbolKind.CLASS,
     "enum_declaration": SymbolKind.ENUM,
     "function_declaration": SymbolKind.FUNCTION,
+    "function_signature": SymbolKind.FUNCTION,
     "generator_function_declaration": SymbolKind.FUNCTION,
     "interface_declaration": SymbolKind.INTERFACE,
     "type_alias_declaration": SymbolKind.TYPE_ALIAS,
@@ -349,6 +351,13 @@ class TypeScriptRepositoryAnalyzer:
                 declaration = top_level.child_by_field_name("declaration")
                 decorator_nodes.extend(
                     child for child in top_level.named_children if child.type == "decorator"
+                )
+                if declaration is None:
+                    continue
+            if declaration.type == "ambient_declaration":
+                declaration = next(
+                    (child for child in declaration.named_children if child.type != "decorator"),
+                    None,
                 )
                 if declaration is None:
                     continue
