@@ -139,6 +139,40 @@ def test_extracts_class_decorators() -> None:
     assert controller.location.line == 8
 
 
+def test_extracts_abstract_classes(tmp_path: Path) -> None:
+    _write_script(tmp_path / "base.ts", "export abstract class Base {}\n")
+
+    artifact = TypeScriptRepositoryAnalyzer().analyze(tmp_path)
+
+    assert [(symbol.name, symbol.kind) for symbol in artifact.modules[0].symbols] == [
+        ("Base", SymbolKind.CLASS)
+    ]
+
+
+def test_extracts_ambient_declarations(tmp_path: Path) -> None:
+    _write_script(
+        tmp_path / "types.d.ts",
+        "\n".join(
+            (
+                "declare function boot(): void;",
+                "declare class Service {}",
+                "declare const version: string;",
+                "export declare abstract class Controller {}",
+            )
+        ),
+    )
+
+    artifact = TypeScriptRepositoryAnalyzer().analyze(tmp_path)
+
+    assert [(symbol.name, symbol.kind) for symbol in artifact.modules[0].symbols] == [
+        ("boot", SymbolKind.FUNCTION),
+        ("Service", SymbolKind.CLASS),
+        ("version", SymbolKind.VARIABLE),
+        ("Controller", SymbolKind.CLASS),
+    ]
+    assert not artifact.diagnostics
+
+
 def test_parses_tsx_without_treating_jsx_as_an_error() -> None:
     artifact = TypeScriptRepositoryAnalyzer().analyze(_FIXTURE)
     component = next(module for module in artifact.modules if module.name == "components.OrderCard")
