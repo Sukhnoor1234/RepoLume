@@ -57,8 +57,9 @@ A valid request will eventually return `202 Accepted`:
 The worker now implements commit-pinned public GitHub retrieval, redirect
 validation, bounded streaming, archive inspection, safe extraction, and
 temporary cleanup. It can produce versioned Python and TypeScript/JavaScript
-static-analysis artifacts from the isolated source. This endpoint remains
-disabled until queue delivery, ownership, and persistence are implemented.
+analysis artifacts and compose them into one language-neutral repository
+architecture graph. This endpoint remains disabled until queue delivery,
+ownership, and persistence are implemented.
 
 ## Inspect an analysis
 
