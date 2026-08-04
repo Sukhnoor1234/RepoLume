@@ -203,3 +203,32 @@ The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions remains the authoritative CI record after the
 branch is pushed. API CI also applies the PostgreSQL migration, checks model
 and migration drift, and runs storage tests against PostgreSQL 17.
+
+## Checkpoint 13
+
+Branch: `feature/analysis-queue`
+
+Captured: August 3, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 115 tests passed in 2.45 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 13 API pytest results](checkpoint-13-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 158 tests passed in 1.13 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 13 worker pytest results](checkpoint-13-worker-pytest.png)
+
+The screenshots are documentation artifacts rendered from the exact output of
+fresh local runs. GitHub Actions starts Redis 8.8.1 and runs the separated API
+publisher and worker consumer-group integration tests. API CI also applies the
+PostgreSQL migration and checks model/migration drift.

@@ -3,8 +3,9 @@
 This document defines the job-state contract shared by the analysis API and
 worker. The API now exposes submission and status shapes through an injected
 job-service boundary. The worker pipeline connects repository retrieval, source
-analysis, architecture composition, lifecycle history, and cleanup. Durable
-queue delivery and persistent job processing are not connected yet.
+analysis, architecture composition, lifecycle history, and cleanup. Redis Stream delivery and acknowledgement primitives
+are implemented, but the
+runtime consumer and persistent job processing are not connected yet.
 
 ```mermaid
 stateDiagram-v2
@@ -40,9 +41,8 @@ stateDiagram-v2
 
 ## Deferred details
 
-- Queue delivery and acknowledgement behavior
-- Retry limits and backoff
-- Lease duration and abandoned-job recovery
+- Runtime queue-to-pipeline orchestration
+- Retry limits, backoff, and dead-letter policy
 - Cancellation
 - Progress events
 - Wiring worker-produced failure codes into durable storage

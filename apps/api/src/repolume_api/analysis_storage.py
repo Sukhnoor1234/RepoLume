@@ -3,6 +3,7 @@
 import re
 from dataclasses import dataclass
 from datetime import datetime
+from uuid import uuid4
 
 from pydantic import ValidationError
 from sqlalchemy import Engine, func, update
@@ -10,7 +11,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
 from repolume_api.analysis_schemas import AnalysisStatus, RepositoryArchitectureResponse
-from repolume_api.database_models import AnalysisArchitectureModel, AnalysisJobModel
+from repolume_api.database_models import (
+    AnalysisArchitectureModel,
+    AnalysisJobModel,
+    AnalysisOutboxModel,
+)
 from repolume_api.repositories import RepositoryReference
 
 _COMMIT_SHA = re.compile(r"[0-9a-f]{40}", re.ASCII)
@@ -115,7 +120,7 @@ class AnalysisStorage:
         analysis_id: str,
         repository: RepositoryReference,
     ) -> StoredAnalysisJob:
-        """Create one queued job without publishing it to a worker."""
+        """Atomically create one queued job and its unpublished request event."""
 
         self._validate_analysis_id(analysis_id)
         model = AnalysisJobModel(
@@ -130,6 +135,21 @@ class AnalysisStorage:
         try:
             with self._sessions.begin() as session:
                 session.add(model)
+                session.add(
+                    AnalysisOutboxModel(
+                        outbox_id=str(uuid4()),
+                        analysis_id=analysis_id,
+                        event_type="analysis_requested",
+                        payload={
+                            "schema_version": "1.0",
+                            "analysis_id": analysis_id,
+                            "provider": "github",
+                            "owner": repository.owner,
+                            "repository": repository.repository,
+                            "ref": repository.ref,
+                        },
+                    )
+                )
                 session.flush()
                 session.refresh(model)
         except IntegrityError as exc:
