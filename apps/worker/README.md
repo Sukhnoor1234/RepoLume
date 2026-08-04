@@ -8,9 +8,10 @@ The worker validates runtime configuration, enforces the analysis-job
 lifecycle, and can safely retrieve an isolated snapshot of a public GitHub
 repository. Its internal pipeline connects retrieval, Python and
 TypeScript/JavaScript analysis, language-neutral architecture composition, and
-temporary cleanup without executing repository code. The pipeline is not
-connected to the API job-service boundary or a durable queue yet, and the
-worker does not persist results.
+temporary cleanup without executing repository code. Redis Stream consumer
+group primitives now support validated reads, stale-message recovery, and
+explicit acknowledgement. The pipeline is not connected to that consumer or
+the API job-service boundary yet, and the worker does not persist results.
 
 The state rules are documented in the
 [analysis worker lifecycle](../../docs/worker/lifecycle.md). The network, archive,
@@ -22,7 +23,9 @@ confidence, and parser boundaries are documented in
 and the
 [repository architecture artifact](../../docs/worker/repository-architecture-artifact.md).
 The complete orchestration and result boundary is documented in the
-[repository analysis pipeline](../../docs/worker/analysis-pipeline.md).
+[repository analysis pipeline](../../docs/worker/analysis-pipeline.md). Queue
+delivery
+is documented in the [analysis request queue](../../docs/worker/analysis-queue.md).
 
 ## Local setup
 
@@ -48,7 +51,7 @@ python -m repolume_worker --check
 ```
 
 The JSON result intentionally reports `"queue_backend": "not_configured"`
-until the queue milestone is implemented.
+until the queue consumer is connected to the runtime command.
 
 ## Quality checks
 
@@ -64,3 +67,7 @@ python -m pip check
 `REPOLUME_ENVIRONMENT` controls the environment reported by the worker. Its
 allowed values are `development`, `test`, `staging`, and `production`; the
 default is `development`.
+
+The queue adapter reads `REPOLUME_REDIS_URL`, with optional stream, consumer
+group, and stale-claim settings documented in
+[analysis request queue](../../docs/worker/analysis-queue.md).

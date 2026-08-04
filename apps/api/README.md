@@ -8,14 +8,17 @@ The API exposes service health, generated OpenAPI documentation, consistent
 error responses, repository preflight, and versioned analysis job routes. A
 transactional storage repository now persists lifecycle state and completed
 architecture artifacts behind PostgreSQL-ready SQLAlchemy models and Alembic
-migrations. The default HTTP adapter still returns a safe `503` until queue
-publication is implemented. Repository analysis never runs inside an API
+migrations. Job creation now writes a transactional outbox event, and an
+isolated publisher can deliver it to Redis Streams with recoverable leases. The
+default HTTP adapter still returns a safe `503` until that publisher is wired. Repository analysis never runs inside an
+API
 request.
 
 The HTTP boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md),
 and persistence behavior is documented in
-[analysis job storage](../../docs/api/analysis-storage.md).
+[analysis job storage](../../docs/api/analysis-storage.md) and the
+[analysis request queue](../../docs/worker/analysis-queue.md).
 
 ## Local setup
 
@@ -91,5 +94,7 @@ Apply the current migration before starting a configured deployment:
 python -m alembic upgrade head
 ```
 
-The storage repository is not wired into analysis submission until queue
-publication can be made reliable.
+`REPOLUME_REDIS_URL` configures the isolated queue publisher when it is
+constructed. Credentials remain in deployment environment variables and are
+redacted from diagnostics. The storage and publisher are not wired into HTTP
+analysis submission in this checkpoint.

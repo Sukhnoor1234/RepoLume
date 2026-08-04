@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "apps/worker/**"
+      - "docs/decisions/**"
       - "docs/worker/**"
       - "docs/security/**"
       - ".github/workflows/worker-ci.yml"
@@ -12,6 +13,7 @@ on:
       - main
     paths:
       - "apps/worker/**"
+      - "docs/decisions/**"
       - "docs/worker/**"
       - "docs/security/**"
       - ".github/workflows/worker-ci.yml"
@@ -22,6 +24,18 @@ permissions:
 jobs:
   verify-worker:
     runs-on: ubuntu-latest
+    env:
+      REPOLUME_TEST_REDIS_URL: redis://localhost:6379/0
+    services:
+      redis:
+        image: redis:8.8.1-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: apps/worker
@@ -51,6 +65,9 @@ jobs:
 
       - name: Test
         run: python -m pytest
+
+      - name: Test Redis integration
+        run: python -m pytest -m integration
 
       - name: Check worker readiness
         run: python -m repolume_worker --check

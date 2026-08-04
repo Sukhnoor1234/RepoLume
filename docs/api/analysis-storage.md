@@ -1,19 +1,18 @@
 # Analysis job storage
 
-- **Status:** Implemented as an isolated API capability
-- **Checkpoint:** 12
+- **Status:** Storage and transactional outbox implemented as isolated capabilities
+- **Checkpoint:** 13
 - **Database target:** PostgreSQL 17+
-- **Migration head:** `0001_analysis_storage`
+- **Migration head:** `0002_analysis_outbox`
 
-RepoLume stores analysis lifecycle state separately from the complete
-architecture graph. The storage repository is implemented and tested, but it is
-not connected to the HTTP job-service boundary yet. Analysis submission still
-fails safely until the queue checkpoint can make persistence and publication
-one reliable operation.
+RepoLume stores analysis lifecycle state separately from architecture results
+and queue publication state. The repository and outbox publisher are tested,
+but they are not connected to the HTTP job-service boundary yet.
 
 ```mermaid
 erDiagram
     ANALYSIS_JOBS ||--o| ANALYSIS_ARCHITECTURES : "owns after completion"
+    ANALYSIS_JOBS ||--|| ANALYSIS_OUTBOX_EVENTS : "creates atomically"
     ANALYSIS_JOBS {
         varchar analysis_id PK
         varchar provider
@@ -22,11 +21,6 @@ erDiagram
         varchar requested_ref
         varchar commit_sha
         varchar status
-        varchar failure_code
-        text failure_message
-        timestamptz created_at
-        timestamptz updated_at
-        timestamptz finished_at
         integer version
     }
     ANALYSIS_ARCHITECTURES {
@@ -35,40 +29,49 @@ erDiagram
         jsonb payload
         timestamptz created_at
     }
+    ANALYSIS_OUTBOX_EVENTS {
+        varchar outbox_id PK
+        varchar analysis_id FK
+        varchar event_type
+        jsonb payload
+        timestamptz claimed_at
+        varchar claim_token
+        integer publish_attempts
+        timestamptz published_at
+        varchar redis_stream_id
+    }
 ```
 
-## Job table
+## Job and architecture records
 
-`analysis_jobs` is the durable source of truth for one analysis attempt. It
-stores the normalized GitHub identity, requested ref, immutable commit SHA once
-resolved, lifecycle status, safe failure details, timestamps, and an increasing
-version number.
+`analysis_jobs` is the durable source of truth for one attempt. Database checks
+enforce known lifecycle states, paired safe failure fields, terminal timestamps,
+commit SHA length, and unique analysis IDs. The `(status, created_at)` index
+supports operational queries.
 
-The database enforces:
+`analysis_architectures` stores one validated JSONB v1 artifact for a completed
+job. Completion updates the job and inserts the graph in one transaction, so a
+completed job cannot be committed without its result.
 
-- one of `queued`, `cloning`, `analyzing`, `completed`, or `failed`
-- failure code and message together, and only for `failed`
-- `finished_at` exactly for terminal jobs
-- a 40-character commit SHA when one is present
-- unique analysis identifiers
+## Transactional outbox
 
-An index on `(status, created_at)` supports future worker claims and operations
-queries without defining queue behavior in this checkpoint.
+`analysis_outbox_events` stores exactly one `analysis_requested` event per job.
+`AnalysisStorage.create_job` inserts both rows in one transaction. If either
+insert fails, neither survives.
 
-## Architecture table
+Publishers lease available rows through `FOR UPDATE SKIP LOCKED`, commit that
+short claim, and then call Redis outside the transaction. Successful publication
+records the Redis Stream ID. A failed Redis call releases the claim; an
+abandoned claim can be recovered after its timeout. The database constrains
+publication timestamps and stream IDs to appear together.
 
-`analysis_architectures` stores one JSONB document for a completed job. The
-payload must pass the strict v1 API architecture schema before it enters a
-transaction and again when it is read. The foreign key uses `ON DELETE CASCADE`
-so a future retention operation cannot orphan large artifacts.
+This closes the lost-message window but intentionally provides at-least-once,
+not exactly-once, delivery. See [ADR 0004](../decisions/0004-analysis-queue.md)
+and [analysis request queue](../worker/analysis-queue.md).
 
-Graph data remains a versioned document because nodes, edges, evidence, and
-summary counts are produced and consumed as one artifact. Frequently queried
-job state remains relational instead of being buried inside JSON.
+## Lifecycle consistency
 
-## Transaction rules
-
-The storage repository uses short transactions and compare-and-set updates:
+State changes use compare-and-set updates:
 
 ```text
 UPDATE analysis_jobs
@@ -76,51 +79,29 @@ SET status = :next_status, version = version + 1
 WHERE analysis_id = :id AND status = :expected_status
 ```
 
-A zero-row update is either a missing job or a stale worker and becomes a
-controlled error. Skipped, repeated, backward, and terminal-state transitions
-are rejected before or during the transaction.
+A zero-row update becomes a controlled missing-job or stale-worker conflict.
+This also makes duplicate Redis delivery safe: only one delivery can advance a
+job from a given expected state.
 
-Completion updates the job and inserts its architecture inside one transaction.
-If validation or insertion fails, the job remains `analyzing`; a completed job
-cannot exist without the same transaction persisting its graph.
+## Configuration and verification
 
-## Configuration
-
-The API reads `REPOLUME_DATABASE_URL`. It must use the
-`postgresql+psycopg://` driver and include a database name. Passwords are never
-stored in repository configuration, and the diagnostic URL representation
-redacts them.
+`REPOLUME_DATABASE_URL` must use `postgresql+psycopg://` and contain a database
+name. Diagnostic URL representations redact passwords.
 
 Run migrations from `apps/api`:
 
 ```bash
 python -m alembic upgrade head
+python -m alembic check
 ```
 
-Review PostgreSQL DDL without connecting:
-
-```bash
-python -m alembic upgrade head --sql
-```
-
-## Verification
-
-Local integration tests use temporary SQLite databases to exercise transaction
-and constraint behavior quickly. API CI starts PostgreSQL 17, applies the real
-Alembic migration, and runs the same repository suite against Psycopg. Offline
-verification also confirms the migration emits JSONB, constraints, indexes,
-and cascading foreign keys.
+Local unit tests use temporary SQLite databases for fast transaction coverage.
+API CI starts PostgreSQL 17 and Redis, applies the real Alembic chain, checks
+model/migration drift, runs repository tests against Psycopg, and verifies real
+Redis publication.
 
 ## Intentional limitations
 
-Checkpoint 12 does not include:
-
-- an `AnalysisJobService` adapter
-- queue publication, worker claims, acknowledgements, retries, or leases
-- API submission enablement
-- authentication, authorization, or ownership columns
-- retention jobs, deletion endpoints, backups, or restore procedures
-- connection deployment secrets or production infrastructure
-
-Those boundaries remain explicit so adding storage cannot accidentally make the
-API acknowledge work that no worker can receive.
+Checkpoint 13 does not include an HTTP `AnalysisJobService` adapter, a
+continuously running publisher, pipeline result persistence, authentication or
+ownership, retention jobs, backups, or production infrastructure.

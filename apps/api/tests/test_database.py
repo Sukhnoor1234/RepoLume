@@ -9,7 +9,7 @@ from sqlalchemy import JSON
 from sqlalchemy.dialects import postgresql
 
 from repolume_api.database import DatabaseSettings, create_database_engine
-from repolume_api.database_models import AnalysisArchitectureModel, Base
+from repolume_api.database_models import AnalysisArchitectureModel, AnalysisOutboxModel, Base
 
 _API_ROOT = Path(__file__).parents[1]
 
@@ -68,16 +68,22 @@ def test_engine_creation_does_not_open_a_connection() -> None:
 
 
 def test_models_define_expected_tables_and_postgresql_jsonb() -> None:
-    assert set(Base.metadata.tables) == {"analysis_jobs", "analysis_architectures"}
+    assert set(Base.metadata.tables) == {
+        "analysis_jobs",
+        "analysis_architectures",
+        "analysis_outbox_events",
+    }
     payload_type = AnalysisArchitectureModel.__table__.c.payload.type
 
     assert isinstance(payload_type, JSON)
     assert isinstance(payload_type.dialect_impl(postgresql.dialect()), postgresql.JSONB)
+    outbox_payload_type = AnalysisOutboxModel.__table__.c.payload.type
+    assert isinstance(outbox_payload_type.dialect_impl(postgresql.dialect()), postgresql.JSONB)
 
 
 def test_alembic_has_one_linear_head() -> None:
     config = Config(_API_ROOT / "alembic.ini")
     scripts = ScriptDirectory.from_config(config)
 
-    assert scripts.get_heads() == ["0001_analysis_storage"]
+    assert scripts.get_heads() == ["0002_analysis_outbox"]
     assert scripts.get_base() == "0001_analysis_storage"
