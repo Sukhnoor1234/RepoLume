@@ -176,3 +176,30 @@ Result: 128 tests passed in 0.77 seconds.
 The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions remains the authoritative CI record after the
 branch is pushed.
+
+## Checkpoint 12
+
+Branch: `feature/analysis-storage`
+
+Captured: August 3, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 96 tests passed in 4.90 seconds.
+
+![Checkpoint 12 API pytest results](checkpoint-12-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 128 tests passed in 1.47 seconds.
+
+![Checkpoint 12 worker pytest results](checkpoint-12-worker-pytest.png)
+
+The screenshots are documentation artifacts rendered from the exact output of
+fresh local runs. GitHub Actions remains the authoritative CI record after the
+branch is pushed. API CI also applies the PostgreSQL migration, checks model
+and migration drift, and runs storage tests against PostgreSQL 17.
