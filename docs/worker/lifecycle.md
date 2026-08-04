@@ -45,4 +45,4 @@ stateDiagram-v2
 - Lease duration and abandoned-job recovery
 - Cancellation
 - Progress events
-- Persistence of safe retrieval and analysis failure codes
+- Wiring worker-produced failure codes into durable storage

@@ -5,14 +5,17 @@ This directory contains the HTTP API for RepoLume.
 ## Current milestone
 
 The API exposes service health, generated OpenAPI documentation, consistent
-error responses, repository preflight, and versioned analysis job routes.
-Submission, lifecycle inspection, and architecture retrieval use an injected
-job-service boundary. The default adapter returns a safe `503` until durable
-queue and persistence integrations are configured. Repository analysis never
-runs inside the API request process.
+error responses, repository preflight, and versioned analysis job routes. A
+transactional storage repository now persists lifecycle state and completed
+architecture artifacts behind PostgreSQL-ready SQLAlchemy models and Alembic
+migrations. The default HTTP adapter still returns a safe `503` until queue
+publication is implemented. Repository analysis never runs inside an API
+request.
 
-The planned ingestion boundary is documented in the
-[repository analysis API contract](../../docs/api/repository-analysis-v1.md).
+The HTTP boundary is documented in the
+[repository analysis API contract](../../docs/api/repository-analysis-v1.md),
+and persistence behavior is documented in
+[analysis job storage](../../docs/api/analysis-storage.md).
 
 ## Local setup
 
@@ -77,3 +80,16 @@ python -m pip check
 `REPOLUME_ENVIRONMENT` controls the environment reported by the service. Its
 allowed values are `development`, `test`, `staging`, and `production`; the
 default is `development`.
+
+`REPOLUME_DATABASE_URL` configures storage and must use a
+`postgresql+psycopg://` URL containing a database name. Keep credentials in the
+deployment environment rather than repository files.
+
+Apply the current migration before starting a configured deployment:
+
+```bash
+python -m alembic upgrade head
+```
+
+The storage repository is not wired into analysis submission until queue
+publication can be made reliable.

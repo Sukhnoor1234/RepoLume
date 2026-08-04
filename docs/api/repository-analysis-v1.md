@@ -152,13 +152,19 @@ The application factory accepts an `AnalysisJobService`. Its adapter must:
 - return a validated architecture artifact only after completion
 - map missing and incomplete jobs to the service exceptions defined by the API
 
-The default adapter fails closed. Tests use an isolated fake adapter and verify
-normalization, every response shape, stable error mapping, result gating, and
-the generated OpenAPI document.
+The default adapter fails closed. Checkpoint 12 provides a transactional storage
+repository for job state and architecture artifacts, but it is intentionally not
+an `AnalysisJobService` yet. Submission must coordinate durable creation with
+queue publication before the adapter can safely return `202`.
+
+Route tests use an isolated fake adapter and verify normalization, every
+response shape, stable error mapping, result gating, and the generated OpenAPI
+document. Storage behavior is documented in
+[analysis job storage](analysis-storage.md).
 
 ## Deferred decisions
 
-- PostgreSQL schema, migrations, and retention
+- retention, deletion, backup, and restore operations
 - Redis queue delivery, acknowledgement, retries, and abandoned-job recovery
 - Authentication, authorization, and job ownership
 - Idempotency and duplicate submissions

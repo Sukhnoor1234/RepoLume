@@ -11,9 +11,9 @@ ask questions that are answered with evidence from the source code.
 
 RepoLume is under active development. The repository contains the project
 foundation, the first web interface, repository intake and analysis API
-contracts, and a bounded worker pipeline for public GitHub snapshots. The API
-now defines submission, lifecycle inspection, and architecture result routes,
-while failing safely until durable queue and persistence adapters are connected.
+contracts, a bounded worker pipeline, and PostgreSQL-ready analysis storage.
+The API still fails safely until durable queue publication connects these
+pieces into a complete asynchronous workflow.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
