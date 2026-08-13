@@ -14,7 +14,9 @@ foundation, the first web interface, repository intake and analysis API
 contracts, a bounded worker pipeline, PostgreSQL-backed analysis storage, and a
 reliable Redis Stream runtime. When explicitly configured, the API can accept a
 repository, publish its durable job, and expose the worker's persisted result.
-Production deployment and the interactive architecture UI remain in progress.
+The web interface can now submit repositories and follow their durable analysis
+status. Production deployment and interactive architecture visualization remain
+in progress.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.

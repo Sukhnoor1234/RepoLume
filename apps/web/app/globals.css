@@ -159,10 +159,50 @@ h1 {
   background: var(--cyan);
   font-size: 13px;
   font-weight: 700;
-  opacity: 0.55;
-  cursor: not-allowed;
+  cursor: pointer;
+  transition: background 150ms ease, opacity 150ms ease, transform 150ms ease;
 }
+.repository-controls button:hover:not(:disabled) { background: #84e6f1; }
+.repository-controls button:active:not(:disabled) { transform: translateY(1px); }
+.repository-controls button:focus-visible { outline: 3px solid rgba(83, 214, 232, 0.25); }
+.repository-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
 .repository-preview p { margin: 9px 0 0; color: #6f8998; font-size: 11px; }
+.analysis-feedback:empty { display: none; }
+.analysis-progress, .analysis-notice {
+  margin-top: 13px;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #07131d;
+}
+.analysis-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 14px;
+}
+.analysis-progress > div { min-width: 0; }
+.analysis-progress-label { display: block; color: #c5d8e1; font-size: 12px; font-weight: 650; }
+.analysis-progress code {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #708b99;
+  font: 9px var(--font-geist-mono), monospace;
+  text-overflow: ellipsis;
+}
+.analysis-progress-status {
+  padding: 5px 8px;
+  border: 1px solid #315466;
+  border-radius: 999px;
+  color: var(--cyan);
+  font: 9px var(--font-geist-mono), monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.analysis-progress > p { grid-column: 1 / -1; }
+.status-failed .analysis-progress-status, .analysis-notice { color: #f3b9ad; border-color: #71443e; }
+.status-completed .analysis-progress-status { color: #8be0b2; border-color: #32664c; }
 .hero-details {
   gap: 21px;
   margin-top: 23px;
