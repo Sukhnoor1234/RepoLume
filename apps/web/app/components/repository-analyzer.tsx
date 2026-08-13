@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
+import { parseArchitecture } from "@/app/lib/architecture-contract";
+import type { RepositoryArchitecture } from "@/app/lib/architecture-contract";
+
 type AnalysisStatus = "queued" | "cloning" | "analyzing" | "completed" | "failed";
 
 type AnalysisState = {
@@ -13,6 +16,17 @@ type AnalysisState = {
 };
 
 type ErrorEnvelope = { error: { code: string; message: string } };
+
+export type ArchitectureDisplayState = {
+  analysisId: string | null;
+  architecture: RepositoryArchitecture | null;
+  loading: boolean;
+  error: string | null;
+};
+
+type RepositoryAnalyzerProps = {
+  onArchitectureChange: (state: ArchitectureDisplayState) => void;
+};
 
 const STATUS_LABELS: Record<AnalysisStatus, string> = {
   queued: "Waiting for a worker",
@@ -70,7 +84,7 @@ async function responsePayload(response: Response): Promise<unknown> {
   }
 }
 
-export function RepositoryAnalyzer() {
+export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerProps) {
   const [repositoryUrl, setRepositoryUrl] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -78,6 +92,7 @@ export function RepositoryAnalyzer() {
   const submissionController = useRef<AbortController | null>(null);
   const currentAnalysisId = analysis?.analysisId;
   const currentStatus = analysis?.status;
+  const resultAvailable = analysis?.resultAvailable ?? false;
 
   useEffect(() => () => submissionController.current?.abort(), []);
 
@@ -122,6 +137,66 @@ export function RepositoryAnalyzer() {
     return () => controller.abort();
   }, [currentAnalysisId, currentStatus]);
 
+  useEffect(() => {
+    if (!currentAnalysisId || currentStatus !== "completed" || !resultAvailable) return;
+    const controller = new AbortController();
+    onArchitectureChange({
+      analysisId: currentAnalysisId,
+      architecture: null,
+      loading: true,
+      error: null,
+    });
+
+    async function loadArchitecture() {
+      try {
+        const response = await fetch(`/api/analyses/${currentAnalysisId}/architecture`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+        const payload = await responsePayload(response);
+        if (!response.ok) {
+          onArchitectureChange({
+            analysisId: currentAnalysisId,
+            architecture: null,
+            loading: false,
+            error:
+              parseError(payload)?.error.message ??
+              "RepoLume could not load the completed architecture.",
+          });
+          return;
+        }
+        const architecture = parseArchitecture(payload);
+        if (!architecture) {
+          onArchitectureChange({
+            analysisId: currentAnalysisId,
+            architecture: null,
+            loading: false,
+            error: "RepoLume received an invalid architecture response.",
+          });
+          return;
+        }
+        onArchitectureChange({
+          analysisId: currentAnalysisId,
+          architecture,
+          loading: false,
+          error: null,
+        });
+      } catch {
+        if (!controller.signal.aborted) {
+          onArchitectureChange({
+            analysisId: currentAnalysisId,
+            architecture: null,
+            loading: false,
+            error: "RepoLume could not reach the architecture service.",
+          });
+        }
+      }
+    }
+
+    void loadArchitecture();
+    return () => controller.abort();
+  }, [currentAnalysisId, currentStatus, onArchitectureChange, resultAvailable]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     submissionController.current?.abort();
@@ -130,6 +205,12 @@ export function RepositoryAnalyzer() {
     setSubmitting(true);
     setAnalysis(null);
     setNotice(null);
+    onArchitectureChange({
+      analysisId: null,
+      architecture: null,
+      loading: false,
+      error: null,
+    });
 
     try {
       const response = await fetch("/api/analyses", {
@@ -201,7 +282,7 @@ export function RepositoryAnalyzer() {
             </div>
             <span className="analysis-progress-status">{analysis.status}</span>
             {analysis.status === "completed" && analysis.resultAvailable ? (
-              <p>Your architecture is ready. Interactive graph exploration is the next milestone.</p>
+              <p>Your architecture is ready in the explorer.</p>
             ) : null}
             {analysis.failure ? <p>{analysis.failure.message}</p> : null}
           </div>
