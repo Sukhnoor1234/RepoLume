@@ -260,3 +260,31 @@ integration tests are separated for CI.
 The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions starts PostgreSQL 17 and Redis 8.8.1, then
 verifies real queue delivery, durable completion, and acknowledgement.
+
+## Checkpoint 15
+
+Branch: `feature/web-analysis-flow`
+
+Captured: August 12, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 127 tests passed in 7.11 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 15 API pytest results](checkpoint-15-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 181 tests passed in 6.71 seconds; the live Redis and PostgreSQL
+integration tests are separated for CI.
+
+![Checkpoint 15 worker pytest results](checkpoint-15-worker-pytest.png)
+
+The web verification also completed a production Vinext build, five rendered
+and route-level tests, ESLint, a zero-vulnerability production dependency
+audit, and desktop and mobile browser checks.

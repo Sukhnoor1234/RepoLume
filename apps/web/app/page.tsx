@@ -1,3 +1,5 @@
+import { RepositoryAnalyzer } from "@/app/components/repository-analyzer";
+
 const architectureNodes = [
   { label: "Frontend", type: "Interface", className: "node-frontend" },
   { label: "API Gateway", type: "Entry point", className: "node-gateway" },
@@ -37,20 +39,7 @@ export default function Home() {
             in the source code.
           </p>
 
-          <div className="repository-preview" aria-label="Repository analyzer preview">
-            <label htmlFor="repository-url">Public GitHub repository</label>
-            <div className="repository-controls">
-              <input
-                id="repository-url"
-                type="url"
-                placeholder="github.com/owner/repository"
-                readOnly
-                aria-describedby="repository-note"
-              />
-              <button type="button" disabled>Analyze repository</button>
-            </div>
-            <p id="repository-note">Repository analysis will be added in a later milestone.</p>
-          </div>
+          <RepositoryAnalyzer />
 
           <div className="hero-details" aria-label="Initial product scope">
             <span>TypeScript</span>
