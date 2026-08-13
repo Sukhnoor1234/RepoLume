@@ -14,9 +14,9 @@ foundation, the first web interface, repository intake and analysis API
 contracts, a bounded worker pipeline, PostgreSQL-backed analysis storage, and a
 reliable Redis Stream runtime. When explicitly configured, the API can accept a
 repository, publish its durable job, and expose the worker's persisted result.
-The web interface can now submit repositories and follow their durable analysis
-status. Production deployment and interactive architecture visualization remain
-in progress.
+The web interface can now submit repositories, follow their durable analysis
+status, and turn a completed result into an interactive source-linked graph.
+Production deployment and repository chat remain in progress.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -79,7 +79,9 @@ npm install
 npm run dev
 ```
 
-The repository input is intentionally disabled until the ingestion milestone.
+Set `REPOLUME_API_URL` to the FastAPI origin to enable repository submission,
+status polling, and completed architecture retrieval. Without it, the web
+boundary returns a safe service-unavailable response.
 
 ## Run the API
 

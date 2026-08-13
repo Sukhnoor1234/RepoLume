@@ -34,21 +34,47 @@ test("server-renders the RepoLume analysis entry point", async () => {
 
 test("connects the repository form through same-origin analysis routes", async () => {
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const experience = await readFile(
+    new URL("../app/components/analysis-experience.tsx", import.meta.url),
+    "utf8",
+  );
   const component = await readFile(
     new URL("../app/components/repository-analyzer.tsx", import.meta.url),
+    "utf8",
+  );
+  const panel = await readFile(
+    new URL("../app/components/architecture-panel.tsx", import.meta.url),
+    "utf8",
+  );
+  const explorer = await readFile(
+    new URL("../app/components/architecture-explorer.tsx", import.meta.url),
     "utf8",
   );
   const submitRoute = await readFile(
     new URL("../app/api/analyses/route.ts", import.meta.url),
     "utf8",
   );
+  const architectureRoute = await readFile(
+    new URL("../app/api/analyses/[analysisId]/architecture/route.ts", import.meta.url),
+    "utf8",
+  );
 
-  assert.match(page, /<RepositoryAnalyzer \/>/);
+  assert.match(page, /<AnalysisExperience \/>/);
+  assert.match(experience, /<RepositoryAnalyzer onArchitectureChange=/);
+  assert.match(experience, /<ArchitecturePanel display=/);
   assert.match(component, /onSubmit=\{submit\}/);
   assert.match(component, /fetch\("\/api\/analyses"/);
+  assert.match(component, /\/architecture`/);
   assert.match(component, /aria-live="polite"/);
   assert.doesNotMatch(component, /REPOLUME_API_URL|dangerouslySetInnerHTML/);
+  assert.match(panel, /dynamic\(/);
+  assert.match(explorer, /<ReactFlow/);
+  assert.match(explorer, /source evidence/i);
   assert.match(submitRoute, /proxyApiRequest\("\/v1\/analyses"/);
+  assert.match(
+    architectureRoute,
+    /`\/v1\/analyses\/\$\{encodeURIComponent\(analysisId\)\}\/architecture`/,
+  );
 });
 
 test("rejects malformed repository submissions at the web boundary", async () => {
@@ -83,7 +109,7 @@ test("fails closed when the analysis API is not configured", async () => {
   });
 });
 
-test("proxies submission and status through the configured API origin", async () => {
+test("proxies submission, status, and architecture through the configured API origin", async () => {
   const received = [];
   const server = createServer(async (incoming, outgoing) => {
     let body = "";
@@ -93,6 +119,68 @@ test("proxies submission and status through the configured API origin", async ()
     if (incoming.method === "POST") {
       outgoing.writeHead(202);
       outgoing.end(JSON.stringify({ analysis_id: "analysis_web", status: "queued" }));
+      return;
+    }
+    if (incoming.url?.endsWith("/architecture")) {
+      outgoing.writeHead(200);
+      outgoing.end(
+        JSON.stringify({
+          schema_version: "1.0",
+          languages: ["python"],
+          nodes: [
+            {
+              id: "repository",
+              kind: "repository",
+              name: "Repository",
+              language: null,
+              location: null,
+              qualified_name: null,
+              symbol_kind: null,
+              detail: null,
+              confidence: "confirmed",
+              decorators: [],
+              source_bytes: null,
+              line_count: null,
+            },
+            {
+              id: "module:python:app.py",
+              kind: "module",
+              name: "app",
+              language: "python",
+              location: { path: "app.py", line: 1, end_line: 10 },
+              qualified_name: "app",
+              symbol_kind: null,
+              detail: null,
+              confidence: "confirmed",
+              decorators: [],
+              source_bytes: 100,
+              line_count: 10,
+            },
+          ],
+          edges: [
+            {
+              id: "edge:contains",
+              kind: "contains",
+              source: "repository",
+              target: "module:python:app.py",
+              confidence: "confirmed",
+              location: { path: "app.py", line: 1, end_line: 1 },
+            },
+          ],
+          diagnostics: [],
+          summary: {
+            language_count: 1,
+            node_count: 2,
+            edge_count: 1,
+            module_count: 1,
+            symbol_count: 0,
+            entry_point_count: 0,
+            external_dependency_count: 0,
+            dependency_count: 0,
+            diagnostic_count: 0,
+          },
+        }),
+      );
       return;
     }
     outgoing.writeHead(200);
@@ -124,16 +212,20 @@ test("proxies submission and status through the configured API origin", async ()
       body: JSON.stringify({ repository_url: "https://github.com/octocat/Hello-World" }),
     });
     const status = await request("/api/analyses/analysis_web");
+    const architecture = await request("/api/analyses/analysis_web/architecture");
 
     assert.equal(submission.status, 202);
     assert.deepEqual(await submission.json(), { analysis_id: "analysis_web", status: "queued" });
     assert.equal(status.status, 200);
     assert.equal((await status.json()).result_available, true);
+    assert.equal(architecture.status, 200);
+    assert.equal((await architecture.json()).schema_version, "1.0");
     assert.deepEqual(
       received.map(({ method, url }) => ({ method, url })),
       [
         { method: "POST", url: "/v1/analyses" },
         { method: "GET", url: "/v1/analyses/analysis_web" },
+        { method: "GET", url: "/v1/analyses/analysis_web/architecture" },
       ],
     );
   } finally {

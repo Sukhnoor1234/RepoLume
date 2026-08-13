@@ -10,5 +10,5 @@ export async function GET(_request: Request, context: RouteContext) {
   if (!isAnalysisId(analysisId)) {
     return invalidRequest("The analysis identifier is invalid.");
   }
-  return proxyApiRequest(`/v1/analyses/${encodeURIComponent(analysisId)}`);
+  return proxyApiRequest(`/v1/analyses/${encodeURIComponent(analysisId)}/architecture`);
 }

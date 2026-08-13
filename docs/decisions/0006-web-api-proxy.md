@@ -28,9 +28,9 @@ The proxy:
 - limits upstream JSON responses to one megabyte
 - replaces connection and malformed-response details with safe error envelopes
 
-The client independently validates submission and status response shapes before
-using them. It polls only while the job is active and stops on completion,
-failure, service error, or component cleanup.
+The client independently validates submission, status, and completed
+architecture response shapes before using them. It polls only while the job is
+active and stops on completion, failure, service error, or component cleanup.
 
 ## Consequences
 
@@ -38,5 +38,4 @@ failure, service error, or component cleanup.
 - The web server becomes the public transport boundary for the API.
 - Every deployed web environment must configure `REPOLUME_API_URL` to enable
   analysis; otherwise it returns a safe `503`.
-- Authentication, rate limiting, architecture retrieval, and streaming remain
-  later decisions.
+- Authentication, rate limiting, and streaming remain later decisions.

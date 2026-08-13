@@ -5,9 +5,9 @@ This directory contains the RepoLume web application.
 ## Current milestone
 
 The current version includes the responsive product foundation and the first
-real repository-analysis interaction. Visitors can submit a public GitHub URL
-and follow queued, cloning, analyzing, completed, or failed status through a
-same-origin web proxy. Architecture visualization remains the next milestone.
+complete repository-analysis interaction. Visitors can submit a public GitHub
+URL, follow its durable analysis status, and explore a completed architecture
+artifact as an interactive, source-linked dependency graph.
 
 ## Commands
 
@@ -23,5 +23,7 @@ development this is usually `http://127.0.0.1:8000`. The value remains
 server-side and is never included in the browser bundle.
 
 Without this setting, analysis requests fail closed with a safe service
-unavailable message. The boundary is documented in
-[web analysis submission](../../docs/web/analysis-submission.md).
+unavailable message. The transport boundary is documented in
+[web analysis submission](../../docs/web/analysis-submission.md), and the graph
+experience is documented in
+[architecture explorer](../../docs/web/architecture-explorer.md).

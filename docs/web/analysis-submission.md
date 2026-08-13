@@ -1,7 +1,7 @@
 # Web analysis submission
 
 - **Status:** Implemented
-- **Checkpoint:** 15
+- **Checkpoint:** 15, extended in Checkpoint 16
 - **Boundary:** Same-origin proxy to FastAPI v1
 
 Checkpoint 15 turns the landing-page repository field into the first real
@@ -26,7 +26,9 @@ sequenceDiagram
     end
     Worker-->>API: Persist completed or failed state
     Web->>API: GET final status
-    Web-->>Visitor: Show ready or safe failure message
+    Web->>API: GET /v1/analyses/{id}/architecture
+    API-->>Web: Versioned architecture artifact
+    Web-->>Visitor: Show interactive graph or safe failure message
 ```
 
 ## Configuration
@@ -51,9 +53,11 @@ message supplied by that boundary.
   component cleanup.
 - Only the API's safe failure message is displayed; raw exceptions and internal
   addresses are never rendered.
+- Completed artifacts are retrieved through the same-origin boundary and
+  validated again before they become graph state.
 
 ## Intentional limitations
 
-This checkpoint does not fetch or visualize the completed architecture. It also
-does not add authentication, job ownership, cancellation, manual retry,
-progress percentages, streaming, saved analyses, or production deployment.
+The workflow does not add authentication, job ownership, cancellation, manual
+retry, progress percentages, streaming, saved analyses, or production
+deployment.

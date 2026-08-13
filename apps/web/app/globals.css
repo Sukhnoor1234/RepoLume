@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
 
 :root {
   --background: #061019;
@@ -226,6 +227,7 @@ h1 {
   box-shadow: 0 34px 100px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
+.architecture-card-live { min-width: 0; }
 .map-header, .map-footer { padding: 18px 21px; }
 .map-header {
   display: flex;
@@ -248,6 +250,118 @@ h1 {
   background: #153d49;
   font-size: 9px;
 }
+.map-message {
+  min-height: 430px;
+  padding: 32px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+.map-message-error { color: #f3b9ad; }
+
+.explorer-header { min-height: 73px; }
+.explorer-summary {
+  min-height: 42px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  color: #7894a3;
+  font: 9px var(--font-geist-mono), monospace;
+  white-space: nowrap;
+}
+.live-map-shell {
+  height: 480px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 185px;
+}
+.react-flow-region { min-width: 0; background: #07131d; }
+.react-flow-region .react-flow__controls {
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+.react-flow-region .react-flow__controls-button {
+  color: var(--foreground);
+  border-color: var(--border);
+  background: #0d1f2b;
+}
+.react-flow-region .react-flow__minimap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #091722;
+}
+.react-flow-region .react-flow__edge-text {
+  fill: #8ba2af;
+  font: 8px var(--font-geist-mono), monospace;
+}
+.react-flow-region .react-flow__edge-textbg { fill: #07131d; }
+.explorer-node {
+  width: 164px;
+  padding: 11px 13px;
+  border: 1px solid #31566a;
+  border-radius: 10px;
+  background: #0d1f2b;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.explorer-node.is-selected {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(83, 214, 232, 0.13), 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+.explorer-node span {
+  display: block;
+  color: #7592a1;
+  font: 8px var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.explorer-node strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.explorer-node small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+.explorer-node-external_dependency { border-color: #7a5c38; }
+.explorer-node-entry_point { border-color: #625a91; }
+.explorer-node .react-flow__handle { width: 7px; height: 7px; background: var(--cyan); }
+.node-inspector {
+  min-width: 0;
+  padding: 18px 15px;
+  overflow-y: auto;
+  border-left: 1px solid var(--border);
+  background: #091722;
+}
+.node-inspector h3 { margin: 8px 0 0; overflow-wrap: anywhere; font-size: 14px; }
+.node-inspector p { margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.node-inspector dl { margin: 16px 0; }
+.node-inspector dl div {
+  padding: 7px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 9px;
+}
+.node-inspector dt { color: #718b99; }
+.node-inspector dd { margin: 0; color: #c5d8e1; text-transform: capitalize; }
+.node-inspector code {
+  display: block;
+  padding: 9px;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--cyan);
+  background: #07131d;
+  font: 8px/1.5 var(--font-geist-mono), monospace;
+}
+.node-inspector .graph-limit-note { margin-top: 14px; color: var(--amber); }
 
 .architecture-map { position: relative; height: 430px; overflow: hidden; }
 .map-grid {
@@ -335,6 +449,9 @@ h1 {
   .repository-controls { flex-direction: column; }
   .hero-details { flex-wrap: wrap; gap: 10px 16px; }
   .architecture-map { height: 390px; }
+  .live-map-shell { height: auto; grid-template-columns: 1fr; }
+  .react-flow-region { height: 430px; }
+  .node-inspector { min-height: 170px; border-top: 1px solid var(--border); border-left: 0; }
   .map-node { min-width: 98px; padding: 10px; }
   .node-frontend { left: 32%; }
   .node-gateway { left: 31%; }
