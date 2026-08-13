@@ -59,4 +59,9 @@ class RedisQueueSettings:
 def create_redis_client(settings: RedisQueueSettings) -> Redis:
     """Create a decoded Redis client without opening a connection."""
 
-    return Redis.from_url(settings.url, decode_responses=True)
+    return Redis.from_url(
+        settings.url,
+        decode_responses=True,
+        socket_connect_timeout=5,
+        socket_timeout=5,
+    )

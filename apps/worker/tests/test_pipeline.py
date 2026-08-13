@@ -289,3 +289,27 @@ def test_empty_repository_completes_with_root_only(tmp_path: Path) -> None:
     assert result.architecture.languages == ()
     assert [node.id for node in result.architecture.nodes] == ["repository"]
     assert result.architecture.edges == ()
+
+
+class RecordingLifecycleObserver:
+    def __init__(self) -> None:
+        self.events: list[tuple[str, str | None]] = []
+
+    def on_cloning(self) -> None:
+        self.events.append(("cloning", None))
+
+    def on_analyzing(self, commit_sha: str) -> None:
+        self.events.append(("analyzing", commit_sha))
+
+
+def test_notifies_lifecycle_observer_before_analysis() -> None:
+    observer = RecordingLifecycleObserver()
+
+    result = RepositoryAnalysisPipeline(FakeRetriever()).run(
+        _job(),
+        _request(),
+        observer=observer,
+    )
+
+    assert result.status is JobStatus.COMPLETED
+    assert observer.events == [("cloning", None), ("analyzing", _COMMIT_SHA)]

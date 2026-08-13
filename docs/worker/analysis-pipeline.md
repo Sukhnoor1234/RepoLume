@@ -1,7 +1,7 @@
 # Repository analysis pipeline
 
-- **Status:** Implemented as an isolated worker capability
-- **Checkpoint:** 10
+- **Status:** Connected to the bounded worker runtime
+- **Checkpoint:** 14
 - **Result schema:** 1.0
 
 The repository analysis pipeline connects RepoLume's secure retrieval, source
@@ -95,17 +95,19 @@ The production retriever still owns network validation, archive limits,
 extraction safety, and physical cleanup. The pipeline owns ordering, lifecycle,
 result construction, and safe cross-boundary failure behavior.
 
+## Runtime integration
+
+An optional lifecycle observer now persists `cloning` before retrieval and
+`analyzing` with the immutable commit SHA before parsing. The worker runtime
+persists terminal failure or completion and acknowledges Redis only afterward.
+The pipeline remains independently testable because observation is injected.
+
+Runtime ownership, duplicate handling, and stale recovery are documented in
+[analysis runtime wiring](analysis-runtime.md).
+
 ## Intentional limitations
 
-Checkpoint 10 does not include:
-
-- a durable adapter behind the implemented API analysis routes
-- queue delivery, claims, acknowledgements, or retries
-- database persistence, retention, or result retrieval
-- authentication, authorization, or job ownership
-- progress streaming or cancellation
-- container-level outbound network policy
-- UI visualization or AI features
-
-The pipeline is ready to be called by a later queue consumer or controlled local
-integration without changing the analyzer and architecture contracts.
+The connected pipeline still does not include authentication, authorization,
+job ownership, progress streaming, cancellation, heartbeat renewal,
+container-level outbound policy, deployment supervision, UI visualization, or
+AI features.

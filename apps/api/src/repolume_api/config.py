@@ -12,6 +12,7 @@ class Settings:
 
     environment: str = "development"
     service_name: str = "repolume-api"
+    analysis_runtime_enabled: bool = False
 
     def __post_init__(self) -> None:
         if self.environment not in ALLOWED_ENVIRONMENTS:
@@ -22,4 +23,10 @@ class Settings:
     def from_environment(cls) -> "Settings":
         """Load settings from environment variables."""
 
-        return cls(environment=getenv("REPOLUME_ENVIRONMENT", "development"))
+        runtime_value = getenv("REPOLUME_ANALYSIS_RUNTIME_ENABLED", "false").lower()
+        if runtime_value not in {"true", "false"}:
+            raise ValueError("REPOLUME_ANALYSIS_RUNTIME_ENABLED must be true or false")
+        return cls(
+            environment=getenv("REPOLUME_ENVIRONMENT", "development"),
+            analysis_runtime_enabled=runtime_value == "true",
+        )

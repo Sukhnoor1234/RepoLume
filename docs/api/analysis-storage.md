@@ -1,13 +1,14 @@
 # Analysis job storage
 
-- **Status:** Storage and transactional outbox implemented as isolated capabilities
-- **Checkpoint:** 13
+- **Status:** Connected to the API and bounded worker runtime
+- **Checkpoint:** 14
 - **Database target:** PostgreSQL 17+
 - **Migration head:** `0002_analysis_outbox`
 
 RepoLume stores analysis lifecycle state separately from architecture results
-and queue publication state. The repository and outbox publisher are tested,
-but they are not connected to the HTTP job-service boundary yet.
+and queue publication state. The API uses this storage through its durable job
+service, while the worker persists lifecycle outcomes before acknowledging
+Redis deliveries.
 
 ```mermaid
 erDiagram
@@ -102,6 +103,6 @@ Redis publication.
 
 ## Intentional limitations
 
-Checkpoint 13 does not include an HTTP `AnalysisJobService` adapter, a
-continuously running publisher, pipeline result persistence, authentication or
-ownership, retention jobs, backups, or production infrastructure.
+Checkpoint 14 does not include a continuously running worker, authentication
+or ownership, retention jobs, backups, or production infrastructure. The
+publisher runs in the API lifespan only when the analysis runtime is enabled.
