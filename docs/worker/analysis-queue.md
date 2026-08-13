@@ -1,13 +1,13 @@
 # Analysis request queue
 
-- **Status:** Queue primitives implemented; runtime wiring deferred
-- **Checkpoint:** 13
+- **Status:** Queue primitives connected to the bounded runtime
+- **Checkpoint:** 14
 - **Delivery:** At least once
 - **Broker:** Redis Streams
 
-Checkpoint 13 establishes the reliable boundary between durable analysis jobs
-and asynchronous workers. It does not enable HTTP analysis submission or start
-a production worker loop yet.
+Checkpoint 13 established reliable delivery. Checkpoint 14 connects that boundary
+to durable HTTP submission and one-message worker execution. A supervised
+forever-running worker remains deferred.
 
 ```mermaid
 sequenceDiagram
@@ -77,7 +77,8 @@ consumer-group acknowledgement.
 
 ## Intentional limitations
 
-Checkpoint 13 does not include the HTTP job-service adapter, a continuously
-running publisher or worker process, pipeline result persistence, dead-letter
-streams, bounded retry/backoff policy, cancellation, or deployment secrets.
-Those pieces are added only after this boundary is reviewed.
+The connected runtime now includes the HTTP job-service adapter, publisher loop,
+and result persistence. It does not include a continuously running worker
+process, heartbeats, dead-letter streams, bounded retry/backoff policy,
+cancellation, or deployment secrets. See
+[analysis runtime wiring](analysis-runtime.md).

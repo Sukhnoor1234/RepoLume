@@ -1,7 +1,7 @@
 # Repository architecture artifact
 
-- **Status:** Implemented as an isolated worker capability
-- **Checkpoint:** 9
+- **Status:** Persisted by the bounded worker runtime
+- **Checkpoint:** 14
 - **Artifact schema:** 1.0
 
 RepoLume can combine its Python and TypeScript/JavaScript analysis results into
@@ -101,7 +101,7 @@ source discovery, while a relationship requires its own evidence.
 
 ## Intentional limitations
 
-Checkpoint 9 does not include:
+The artifact schema does not model:
 
 - service or component clustering
 - framework route extraction
@@ -109,8 +109,8 @@ Checkpoint 9 does not include:
 - method-level call graphs
 - databases, queues, deployment resources, or infrastructure inference
 - architecture scoring or design recommendations
-- persistence, API submission, UI visualization, or AI features
+- UI visualization or AI-generated explanations
 
-The artifact is returned by the internal analysis pipeline and has a validated
-API response schema. Queue delivery and durable storage remain deferred, so no
-production adapter can expose a completed artifact yet.
+The artifact is returned by the internal analysis pipeline, persisted
+atomically with job completion, and exposed through a validated API response
+schema. Interactive visualization and production deployment remain deferred.

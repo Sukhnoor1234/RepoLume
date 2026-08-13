@@ -58,6 +58,26 @@ class ArchitectureComposer(Protocol):
     ) -> RepositoryArchitectureArtifact: ...
 
 
+class PipelineLifecycleError(RuntimeError):
+    """Base error raised when durable lifecycle observation cannot continue."""
+
+
+class PipelineStateConflict(PipelineLifecycleError):
+    """Raised when another delivery already advanced the durable job."""
+
+
+class PipelineStateUnavailable(PipelineLifecycleError):
+    """Raised when lifecycle persistence is temporarily unavailable."""
+
+
+class PipelineLifecycleObserver(Protocol):
+    """Durable active-state callbacks emitted before expensive analysis work."""
+
+    def on_cloning(self) -> None: ...
+
+    def on_analyzing(self, commit_sha: str) -> None: ...
+
+
 class RepositoryAnalysisPipeline:
     """Run retrieval, source analysis, composition, and cleanup in order."""
 
@@ -103,15 +123,21 @@ class RepositoryAnalysisPipeline:
         self,
         job: AnalysisJob,
         request: RepositoryRequest,
+        *,
+        observer: PipelineLifecycleObserver | None = None,
     ) -> AnalysisPipelineResult:
         """Run one queued job and return only after temporary cleanup succeeds."""
 
         history = [job.status]
         current = self._transition(job, JobStatus.CLONING, history)
+        if observer is not None:
+            observer.on_cloning()
 
         try:
             with self._retriever.retrieve(request) as repository:
                 current = self._transition(current, JobStatus.ANALYZING, history)
+                if observer is not None:
+                    observer.on_analyzing(repository.commit_sha)
                 python_artifact = self._python_analyzer.analyze(repository.source_path)
                 script_artifact = self._script_analyzer.analyze(repository.source_path)
                 try:
@@ -131,6 +157,8 @@ class RepositoryAnalysisPipeline:
                     file_count=repository.file_count,
                     expanded_bytes=repository.expanded_bytes,
                 )
+        except PipelineLifecycleError:
+            raise
         except (RepositoryRetrievalError, RepositoryAnalysisError) as exc:
             raise self._failure(
                 current,

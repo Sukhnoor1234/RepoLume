@@ -10,9 +10,9 @@ transactional storage repository now persists lifecycle state and completed
 architecture artifacts behind PostgreSQL-ready SQLAlchemy models and Alembic
 migrations. Job creation now writes a transactional outbox event, and an
 isolated publisher can deliver it to Redis Streams with recoverable leases. The
-default HTTP adapter still returns a safe `503` until that publisher is wired. Repository analysis never runs inside an
-API
-request.
+durable HTTP adapter and background publisher are installed only when the
+analysis runtime is explicitly enabled. Otherwise, analysis routes return a
+safe `503`. Repository analysis never runs inside an API request.
 
 The HTTP boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md),
@@ -65,7 +65,7 @@ curl -X POST http://127.0.0.1:8000/v1/analyses \
   -d '{"repository_url":"https://github.com/octocat/Hello-World","ref":"main"}'
 ```
 
-A local API started without a durable job adapter intentionally returns
+A local API started without the analysis runtime intentionally returns
 `503 analysis_service_unavailable` for analysis routes. Preflight remains
 available because it performs only local validation.
 
@@ -94,7 +94,7 @@ Apply the current migration before starting a configured deployment:
 python -m alembic upgrade head
 ```
 
-`REPOLUME_REDIS_URL` configures the isolated queue publisher when it is
-constructed. Credentials remain in deployment environment variables and are
-redacted from diagnostics. The storage and publisher are not wired into HTTP
-analysis submission in this checkpoint.
+Set `REPOLUME_ANALYSIS_RUNTIME_ENABLED=true`, `REPOLUME_DATABASE_URL`, and
+`REPOLUME_REDIS_URL` to enable durable submission and background publication.
+Credentials remain in deployment environment variables and are redacted from
+diagnostics. Apply migrations before enabling the runtime.

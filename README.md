@@ -11,10 +11,10 @@ ask questions that are answered with evidence from the source code.
 
 RepoLume is under active development. The repository contains the project
 foundation, the first web interface, repository intake and analysis API
-contracts, a bounded worker pipeline, PostgreSQL-backed analysis storage, and
-a transactional outbox with Redis Stream producer and consumer primitives. The
-API still fails safely until the queue adapters are connected into a complete
-asynchronous workflow.
+contracts, a bounded worker pipeline, PostgreSQL-backed analysis storage, and a
+reliable Redis Stream runtime. When explicitly configured, the API can accept a
+repository, publish its durable job, and expose the worker's persisted result.
+Production deployment and the interactive architecture UI remain in progress.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -115,10 +115,10 @@ python -m pip install -e ".[dev]"
 python -m repolume_worker --check
 ```
 
-The current command validates configuration and reports that no runtime queue
-consumer is configured. The internal pipeline and Redis consumer primitives
-remain separate until the next orchestration checkpoint connects queue delivery,
-API submission, and persistent result handling.
+The readiness command validates configuration without connecting. A
+configured worker can process one recovered or new request with
+`python -m repolume_worker --once`. Bounded one-message execution is intentional
+until deployment adds a supervised long-running process.
 
 ## Development workflow
 

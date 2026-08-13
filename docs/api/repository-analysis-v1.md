@@ -1,14 +1,14 @@
 # Repository analysis API contract
 
-- **Status:** HTTP boundary implemented; durable job adapter pending
+- **Status:** HTTP boundary and durable runtime implemented
 - **Version:** v1
-- **Checkpoint:** 11
+- **Checkpoint:** 14
 
 This document defines the HTTP boundary for submitting, inspecting, and reading
 the architecture result of a repository analysis. The routes are implemented
-against an injected job-service interface. The default application does not
-pretend to queue work: it returns a safe `503 Service Unavailable` until a real
-queue and persistence adapter is configured.
+against an injected job-service interface. The production adapter is installed
+only when the analysis runtime is explicitly enabled; otherwise the application
+continues to return a safe `503 Service Unavailable`.
 
 ## Preflight a repository
 
@@ -70,8 +70,9 @@ Without a configured adapter, the route returns:
 }
 ```
 
-The API does not run retrieval or static analysis in the request process. A
-later adapter will persist the initial job and publish it for the worker.
+The API does not run retrieval or static analysis in the request process. The
+durable adapter commits the job and its outbox event before returning; a
+lifespan-owned publisher delivers that event outside the request.
 
 ## Inspect an analysis
 
@@ -145,27 +146,24 @@ Analysis boundary failures use:
 
 ## Integration boundary
 
-The application factory accepts an `AnalysisJobService`. Its adapter must:
+The application factory accepts either an injected `AnalysisJobService` or an
+owned `AnalysisRuntime`. The production runtime:
 
-- create a durable queued job and return its identifier
-- read current lifecycle state and safe terminal failure details
-- return a validated architecture artifact only after completion
-- map missing and incomplete jobs to the service exceptions defined by the API
+- creates a durable queued job and outbox event in one transaction
+- reads current lifecycle state and safe terminal failure details
+- returns a validated architecture only after completion
+- retries Redis publication outside HTTP requests
+- maps missing, incomplete, corrupt, and unavailable storage states to stable
+  service errors
 
-The default adapter fails closed. Checkpoint 12 provides a transactional storage
-repository for job state and architecture artifacts, but it is intentionally not
-an `AnalysisJobService` yet. Submission must coordinate durable creation with
-queue publication before the adapter can safely return `202`.
-
-Route tests use an isolated fake adapter and verify normalization, every
-response shape, stable error mapping, result gating, and the generated OpenAPI
-document. Storage behavior is documented in
-[analysis job storage](analysis-storage.md).
+Set `REPOLUME_ANALYSIS_RUNTIME_ENABLED=true` with the database and Redis URLs to
+install it. The default adapter still fails closed. Runtime ownership and the
+worker path are documented in
+[analysis runtime wiring](../worker/analysis-runtime.md).
 
 ## Deferred decisions
 
 - retention, deletion, backup, and restore operations
-- Redis queue delivery, acknowledgement, retries, and abandoned-job recovery
 - Authentication, authorization, and job ownership
 - Idempotency and duplicate submissions
 - Rate limits

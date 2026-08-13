@@ -232,3 +232,31 @@ The screenshots are documentation artifacts rendered from the exact output of
 fresh local runs. GitHub Actions starts Redis 8.8.1 and runs the separated API
 publisher and worker consumer-group integration tests. API CI also applies the
 PostgreSQL migration and checks model/migration drift.
+
+## Checkpoint 14
+
+Branch: `feature/analysis-runtime`
+
+Captured: August 3, 2026
+
+### API pytest
+
+Command: `python -m pytest` from `apps/api`
+
+Result: 127 tests passed in 3.66 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 14 API pytest results](checkpoint-14-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest` from `apps/worker`
+
+Result: 181 tests passed in 2.30 seconds; the live Redis and PostgreSQL
+integration tests are separated for CI.
+
+![Checkpoint 14 worker pytest results](checkpoint-14-worker-pytest.png)
+
+The screenshots are documentation artifacts rendered from the exact output of
+fresh local runs. GitHub Actions starts PostgreSQL 17 and Redis 8.8.1, then
+verifies real queue delivery, durable completion, and acknowledgement.

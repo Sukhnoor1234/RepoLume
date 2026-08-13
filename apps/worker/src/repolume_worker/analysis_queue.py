@@ -37,7 +37,7 @@ class WorkerQueueSettings:
     url: str = field(repr=False)
     stream_name: str = "repolume:analysis:requests"
     consumer_group: str = "repolume-workers"
-    claim_idle_ms: int = 60_000
+    claim_idle_ms: int = 1_800_000
 
     def __post_init__(self) -> None:
         try:
@@ -62,7 +62,7 @@ class WorkerQueueSettings:
         if not url:
             raise ValueError("REPOLUME_REDIS_URL is required")
         try:
-            claim_idle_ms = int(getenv("REPOLUME_ANALYSIS_CLAIM_IDLE_MS", "60000"))
+            claim_idle_ms = int(getenv("REPOLUME_ANALYSIS_CLAIM_IDLE_MS", "1800000"))
         except ValueError:
             raise ValueError("REPOLUME_ANALYSIS_CLAIM_IDLE_MS must be an integer") from None
         return cls(
@@ -133,7 +133,7 @@ class RedisAnalysisQueue:
         *,
         stream_name: str = "repolume:analysis:requests",
         consumer_group: str = "repolume-workers",
-        claim_idle_ms: int = 60_000,
+        claim_idle_ms: int = 1_800_000,
     ) -> None:
         self._redis = redis
         self._stream_name = stream_name
@@ -278,4 +278,9 @@ class RedisAnalysisQueue:
 def create_redis_client(settings: WorkerQueueSettings) -> Redis:
     """Create a decoded Redis client without opening a connection."""
 
-    return Redis.from_url(settings.url, decode_responses=True)
+    return Redis.from_url(
+        settings.url,
+        decode_responses=True,
+        socket_connect_timeout=5,
+        socket_timeout=5,
+    )

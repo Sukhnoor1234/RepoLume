@@ -8,6 +8,7 @@ from redis import Redis
 from sqlalchemy import create_engine
 
 from repolume_api.analysis_outbox import AnalysisOutboxStorage, RedisOutboxPublisher
+from repolume_api.analysis_runtime import DatabaseAnalysisJobService
 from repolume_api.analysis_storage import AnalysisStorage
 from repolume_api.database_models import Base
 from repolume_api.repositories import RepositoryReference
@@ -22,9 +23,10 @@ def test_publishes_pending_request_to_real_redis_stream() -> None:
     engine = create_engine("sqlite://")
     Base.metadata.create_all(engine)
     try:
-        AnalysisStorage(engine).create_job(
-            "analysis_redis",
-            RepositoryReference(owner="octocat", repository="Hello-World", ref="main"),
+        storage = AnalysisStorage(engine)
+        service = DatabaseAnalysisJobService(storage, id_factory=lambda: "analysis_redis")
+        submitted = service.submit(
+            RepositoryReference(owner="octocat", repository="Hello-World", ref="main")
         )
 
         published = RedisOutboxPublisher(
@@ -32,6 +34,7 @@ def test_publishes_pending_request_to_real_redis_stream() -> None:
         ).publish_batch()
         messages = redis.xrange(stream)
 
+        assert submitted.status == "queued"
         assert published == 1
         assert len(messages) == 1
         assert messages[0][1]["analysis_id"] == "analysis_redis"
