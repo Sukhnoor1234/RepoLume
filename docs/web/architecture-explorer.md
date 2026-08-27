@@ -52,5 +52,5 @@ safe error envelope.
 
 This checkpoint visualizes the existing static-analysis artifact. It does not
 add automatic service clustering, method-level call graphs, animated request
-traces, repository chat, technical-debt scoring, security findings, saved
-analyses, or production deployment.
+traces, generated repository answers, technical-debt scoring, security
+findings, saved analyses, or production deployment.

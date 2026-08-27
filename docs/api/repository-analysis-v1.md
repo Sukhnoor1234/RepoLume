@@ -114,6 +114,25 @@ Active or failed jobs return `409 analysis_not_completed`. The status response
 must report `result_available: true` only for a completed job whose architecture
 can be read.
 
+## Query repository evidence
+
+`POST /v1/analyses/{analysis_id}/evidence-query`
+
+The request contains a question between 3 and 300 characters and an optional
+result limit from 1 to 10:
+
+```json
+{
+  "question": "Where is user authentication implemented?",
+  "limit": 5
+}
+```
+
+The response contains ranked architecture nodes with repository-relative line
+ranges, matched terms, relationship counts, and confidence. It intentionally
+does not contain generated prose. Active or failed jobs return
+`409 analysis_not_completed`, matching architecture retrieval.
+
 ## Error envelope
 
 Errors use one stable top-level shape:

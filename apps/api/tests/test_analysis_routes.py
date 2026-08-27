@@ -248,6 +248,73 @@ def test_architecture_rejects_active_analysis() -> None:
     }
 
 
+def test_evidence_query_returns_ranked_source_matches() -> None:
+    service = FakeAnalysisJobService()
+    service.snapshots["analysis_123"] = replace(
+        _QUEUED,
+        status="completed",
+        result_available=True,
+    )
+    service.architectures["analysis_123"] = _ARCHITECTURE
+
+    with _client(service) as client:
+        response = client.post(
+            "/v1/analyses/analysis_123/evidence-query",
+            json={"question": "Where is the app module?"},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "schema_version": "1.0",
+        "question": "Where is the app module?",
+        "matches": [
+            {
+                "node_id": "module:app",
+                "kind": "module",
+                "name": "app",
+                "language": "python",
+                "location": {"path": "app.py", "line": 1, "end_line": 4},
+                "confidence": "confirmed",
+                "score": 7,
+                "matched_terms": ["app", "module"],
+                "relationship_count": 1,
+            }
+        ],
+    }
+
+
+def test_evidence_query_rejects_active_analysis() -> None:
+    service = FakeAnalysisJobService()
+
+    with _client(service) as client:
+        response = client.post(
+            "/v1/analyses/analysis_123/evidence-query",
+            json={"question": "Where is authentication?"},
+        )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "analysis_not_completed"
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"question": "  "},
+        {"question": "valid question", "limit": 0},
+        {"question": "valid question", "limit": 11},
+        {"question": "valid question", "unexpected": True},
+    ],
+)
+def test_evidence_query_rejects_invalid_payload(payload: dict[str, object]) -> None:
+    service = FakeAnalysisJobService()
+
+    with _client(service) as client:
+        response = client.post("/v1/analyses/analysis_123/evidence-query", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+
+
 def test_analysis_id_rejects_unsafe_path_values() -> None:
     service = FakeAnalysisJobService()
 
@@ -267,6 +334,7 @@ def test_openapi_documents_analysis_contracts() -> None:
     assert document["paths"]["/v1/analyses"]["post"]["responses"]["202"]
     assert document["paths"]["/v1/analyses/{analysis_id}"]["get"]
     assert document["paths"]["/v1/analyses/{analysis_id}/architecture"]["get"]
+    assert document["paths"]["/v1/analyses/{analysis_id}/evidence-query"]["post"]
 
 
 def test_architecture_schema_rejects_undocumented_or_negative_values() -> None:

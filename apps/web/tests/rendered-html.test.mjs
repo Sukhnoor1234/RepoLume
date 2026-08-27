@@ -50,6 +50,10 @@ test("connects the repository form through same-origin analysis routes", async (
     new URL("../app/components/architecture-explorer.tsx", import.meta.url),
     "utf8",
   );
+  const questionPanel = await readFile(
+    new URL("../app/components/repository-question-panel.tsx", import.meta.url),
+    "utf8",
+  );
   const submitRoute = await readFile(
     new URL("../app/api/analyses/route.ts", import.meta.url),
     "utf8",
@@ -58,10 +62,15 @@ test("connects the repository form through same-origin analysis routes", async (
     new URL("../app/api/analyses/[analysisId]/architecture/route.ts", import.meta.url),
     "utf8",
   );
+  const evidenceRoute = await readFile(
+    new URL("../app/api/analyses/[analysisId]/evidence-query/route.ts", import.meta.url),
+    "utf8",
+  );
 
   assert.match(page, /<AnalysisExperience \/>/);
   assert.match(experience, /<RepositoryAnalyzer onArchitectureChange=/);
   assert.match(experience, /<ArchitecturePanel display=/);
+  assert.match(experience, /<RepositoryQuestionPanel analysisId=/);
   assert.match(component, /onSubmit=\{submit\}/);
   assert.match(component, /fetch\("\/api\/analyses"/);
   assert.match(component, /\/architecture`/);
@@ -70,11 +79,15 @@ test("connects the repository form through same-origin analysis routes", async (
   assert.match(panel, /dynamic\(/);
   assert.match(explorer, /<ReactFlow/);
   assert.match(explorer, /source evidence/i);
+  assert.match(questionPanel, /Find evidence/);
+  assert.match(questionPanel, /parseEvidenceQueryResult/);
+  assert.doesNotMatch(questionPanel, /dangerouslySetInnerHTML|REPOLUME_API_URL/);
   assert.match(submitRoute, /proxyApiRequest\("\/v1\/analyses"/);
   assert.match(
     architectureRoute,
     /`\/v1\/analyses\/\$\{encodeURIComponent\(analysisId\)\}\/architecture`/,
   );
+  assert.match(evidenceRoute, /evidence-query`/);
 });
 
 test("rejects malformed repository submissions at the web boundary", async () => {
@@ -91,6 +104,17 @@ test("rejects malformed repository submissions at the web boundary", async () =>
       message: "Enter a valid public GitHub repository URL.",
     },
   });
+});
+
+test("rejects malformed evidence queries at the web boundary", async () => {
+  const response = await request("/api/analyses/analysis_web/evidence-query", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ question: "  " }),
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal((await response.json()).error.code, "validation_error");
 });
 
 test("fails closed when the analysis API is not configured", async () => {
@@ -116,6 +140,29 @@ test("proxies submission, status, and architecture through the configured API or
     for await (const chunk of incoming) body += chunk;
     received.push({ method: incoming.method, url: incoming.url, body });
     outgoing.setHeader("content-type", "application/json");
+    if (incoming.method === "POST" && incoming.url?.endsWith("/evidence-query")) {
+      outgoing.writeHead(200);
+      outgoing.end(
+        JSON.stringify({
+          schema_version: "1.0",
+          question: "Where is the app module?",
+          matches: [
+            {
+              node_id: "module:python:app.py",
+              kind: "module",
+              name: "app",
+              language: "python",
+              location: { path: "app.py", line: 1, end_line: 10 },
+              confidence: "confirmed",
+              score: 7,
+              matched_terms: ["app", "module"],
+              relationship_count: 1,
+            },
+          ],
+        }),
+      );
+      return;
+    }
     if (incoming.method === "POST") {
       outgoing.writeHead(202);
       outgoing.end(JSON.stringify({ analysis_id: "analysis_web", status: "queued" }));
@@ -213,6 +260,11 @@ test("proxies submission, status, and architecture through the configured API or
     });
     const status = await request("/api/analyses/analysis_web");
     const architecture = await request("/api/analyses/analysis_web/architecture");
+    const evidence = await request("/api/analyses/analysis_web/evidence-query", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ question: "Where is the app module?", limit: 5 }),
+    });
 
     assert.equal(submission.status, 202);
     assert.deepEqual(await submission.json(), { analysis_id: "analysis_web", status: "queued" });
@@ -220,12 +272,15 @@ test("proxies submission, status, and architecture through the configured API or
     assert.equal((await status.json()).result_available, true);
     assert.equal(architecture.status, 200);
     assert.equal((await architecture.json()).schema_version, "1.0");
+    assert.equal(evidence.status, 200);
+    assert.equal((await evidence.json()).matches[0].location.path, "app.py");
     assert.deepEqual(
       received.map(({ method, url }) => ({ method, url })),
       [
         { method: "POST", url: "/v1/analyses" },
         { method: "GET", url: "/v1/analyses/analysis_web" },
         { method: "GET", url: "/v1/analyses/analysis_web/architecture" },
+        { method: "POST", url: "/v1/analyses/analysis_web/evidence-query" },
       ],
     );
   } finally {
