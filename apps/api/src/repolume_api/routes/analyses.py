@@ -1,6 +1,6 @@
 """Repository analysis submission and inspection routes."""
 
-from typing import Annotated, NoReturn
+from typing import Annotated, NoReturn, cast
 
 from fastapi import APIRouter, Path, Request, status
 
@@ -17,9 +17,14 @@ from repolume_api.analysis_schemas import (
     AnalysisStatusResponse,
     AnalysisSubmissionRequest,
     AnalysisSubmissionResponse,
+    EvidenceMatchResponse,
+    EvidenceNodeKind,
+    EvidenceQueryRequest,
+    EvidenceQueryResponse,
     RepositoryArchitectureResponse,
 )
 from repolume_api.errors import APIError
+from repolume_api.evidence_retrieval import retrieve_evidence
 from repolume_api.repositories import RepositoryReferenceError, normalize_repository_reference
 from repolume_api.schemas import ErrorResponse
 
@@ -146,3 +151,46 @@ async def get_analysis_architecture(
         return _service(request).get_architecture(analysis_id)
     except (AnalysisServiceUnavailable, AnalysisNotFound, AnalysisNotCompleted) as exc:
         _raise_service_error(exc)
+
+
+@router.post(
+    "/{analysis_id}/evidence-query",
+    response_model=EvidenceQueryResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Analysis not found"},
+        409: {"model": ErrorResponse, "description": "Analysis not completed"},
+        503: {"model": ErrorResponse, "description": "Analysis service unavailable"},
+    },
+    summary="Find source evidence for a repository question",
+)
+async def query_analysis_evidence(
+    analysis_id: AnalysisId,
+    payload: EvidenceQueryRequest,
+    request: Request,
+) -> EvidenceQueryResponse:
+    """Return deterministic source matches without generating an unsupported answer."""
+
+    try:
+        architecture = _service(request).get_architecture(analysis_id)
+    except (AnalysisServiceUnavailable, AnalysisNotFound, AnalysisNotCompleted) as exc:
+        _raise_service_error(exc)
+
+    matches = retrieve_evidence(architecture, payload.question, limit=payload.limit)
+    return EvidenceQueryResponse(
+        question=payload.question,
+        matches=[
+            EvidenceMatchResponse(
+                node_id=match.node.id,
+                kind=cast(EvidenceNodeKind, match.node.kind),
+                name=match.node.name,
+                language=match.node.language,
+                location=match.node.location,
+                confidence=match.node.confidence or "confirmed",
+                score=match.score,
+                matched_terms=list(match.matched_terms),
+                relationship_count=match.relationship_count,
+            )
+            for match in matches
+            if match.node.location is not None
+        ],
+    )

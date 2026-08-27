@@ -7,7 +7,9 @@ This directory contains the RepoLume web application.
 The current version includes the responsive product foundation and the first
 complete repository-analysis interaction. Visitors can submit a public GitHub
 URL, follow its durable analysis status, and explore a completed architecture
-artifact as an interactive, source-linked dependency graph.
+artifact as an interactive, source-linked dependency graph. After completion,
+visitors can ask a repository question and inspect deterministic source matches
+before generated answers are introduced.
 
 ## Commands
 
@@ -26,4 +28,6 @@ Without this setting, analysis requests fail closed with a safe service
 unavailable message. The transport boundary is documented in
 [web analysis submission](../../docs/web/analysis-submission.md), and the graph
 experience is documented in
-[architecture explorer](../../docs/web/architecture-explorer.md).
+[architecture explorer](../../docs/web/architecture-explorer.md). The question
+workflow is documented in
+[repository evidence search](../../docs/web/repository-evidence-search.md).

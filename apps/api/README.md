@@ -14,8 +14,14 @@ durable HTTP adapter and background publisher are installed only when the
 analysis runtime is explicitly enabled. Otherwise, analysis routes return a
 safe `503`. Repository analysis never runs inside an API request.
 
+Completed artifacts also support deterministic evidence queries. This first
+retrieval layer ranks source-located architecture nodes without calling an LLM
+or presenting generated prose as fact.
+
 The HTTP boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md),
+evidence ranking is documented in
+[repository evidence retrieval](../../docs/api/repository-evidence-retrieval.md),
 and persistence behavior is documented in
 [analysis job storage](../../docs/api/analysis-storage.md) and the
 [analysis request queue](../../docs/worker/analysis-queue.md).

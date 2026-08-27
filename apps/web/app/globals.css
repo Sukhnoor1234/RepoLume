@@ -422,6 +422,96 @@ h1 {
 .confirmed { background: var(--cyan); }
 .inferred { background: var(--amber); }
 
+.question-section {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto 76px;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr);
+  gap: 42px;
+  border: 1px solid var(--border-bright);
+  border-radius: 18px;
+  background: rgba(8, 20, 30, 0.86);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.24);
+}
+.question-intro h2 { margin: 9px 0 12px; font-size: 25px; letter-spacing: -0.035em; }
+.question-intro p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.retrieval-note {
+  display: inline-block;
+  margin-top: 19px;
+  padding: 7px 9px;
+  border: 1px solid #635534;
+  border-radius: 999px;
+  color: var(--amber);
+  font: 9px var(--font-geist-mono), monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.question-workspace { min-width: 0; }
+.question-form label {
+  display: block;
+  margin-bottom: 9px;
+  color: #afc1ca;
+  font-size: 12px;
+  font-weight: 600;
+}
+.question-form > div { display: flex; gap: 9px; }
+.question-form input {
+  min-width: 0;
+  height: 45px;
+  flex: 1;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+  color: var(--foreground);
+  background: #07131d;
+  font-size: 13px;
+}
+.question-form input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(83, 214, 232, 0.1);
+}
+.question-form button {
+  height: 45px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 9px;
+  color: #08202a;
+  background: var(--cyan);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.question-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+.question-form button:focus-visible { outline: 3px solid rgba(83, 214, 232, 0.25); }
+.evidence-results { min-height: 108px; margin-top: 15px; }
+.evidence-result-heading { display: flex; flex-direction: column; gap: 3px; }
+.evidence-result-heading span { color: #718b99; font: 9px var(--font-geist-mono), monospace; text-transform: uppercase; }
+.evidence-result-heading strong { overflow-wrap: anywhere; font-size: 13px; }
+.evidence-results ol { margin: 12px 0 0; padding: 0; display: grid; gap: 8px; list-style: none; }
+.evidence-results li {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #07131d;
+}
+.evidence-results li div { min-width: 0; }
+.evidence-results li div span {
+  display: block;
+  color: #738e9d;
+  font: 8px var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.evidence-results li strong { display: block; margin-top: 3px; overflow-wrap: anywhere; font-size: 12px; }
+.evidence-results li code { color: var(--cyan); font: 9px var(--font-geist-mono), monospace; overflow-wrap: anywhere; }
+.evidence-results li p { grid-column: 1 / -1; margin: 0; color: #718b99; font-size: 10px; }
+.empty-evidence { margin: 18px 0 0; color: #718b99; font-size: 12px; }
+
 .principles {
   width: min(1180px, calc(100% - 40px));
   margin: 0 auto;
@@ -439,10 +529,11 @@ h1 {
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; padding-top: 64px; }
   .architecture-card { width: 100%; }
+  .question-section { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
-  .site-nav, .hero, .principles { width: min(100% - 28px, 1180px); }
+  .site-nav, .hero, .principles, .question-section { width: min(100% - 28px, 1180px); }
   .nav-links a:not(.github-link) { display: none; }
   .hero { padding: 50px 0 58px; gap: 48px; }
   h1 { font-size: 48px; }
@@ -452,6 +543,10 @@ h1 {
   .live-map-shell { height: auto; grid-template-columns: 1fr; }
   .react-flow-region { height: 430px; }
   .node-inspector { min-height: 170px; border-top: 1px solid var(--border); border-left: 0; }
+  .question-section { margin-bottom: 50px; padding: 21px; gap: 28px; }
+  .question-form > div { flex-direction: column; }
+  .question-form button { width: 100%; }
+  .evidence-results li { grid-template-columns: 1fr; }
   .map-node { min-width: 98px; padding: 10px; }
   .node-frontend { left: 32%; }
   .node-gateway { left: 31%; }

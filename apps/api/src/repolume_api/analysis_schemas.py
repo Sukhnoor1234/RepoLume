@@ -2,7 +2,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 AnalysisStatus = Literal["queued", "cloning", "analyzing", "completed", "failed"]
 Confidence = Literal["confirmed", "heuristic"]
@@ -17,6 +17,7 @@ SymbolKind = Literal[
     "type_alias",
     "enum",
 ]
+EvidenceNodeKind = Literal["module", "symbol", "entry_point"]
 
 
 class StrictModel(BaseModel):
@@ -141,3 +142,42 @@ class RepositoryArchitectureResponse(StrictModel):
     edges: list[ArchitectureEdgeResponse]
     diagnostics: list[ArchitectureDiagnosticResponse]
     summary: ArchitectureSummaryResponse
+
+
+class EvidenceQueryRequest(StrictModel):
+    """Bounded natural-language query over one completed architecture."""
+
+    question: str = Field(min_length=3, max_length=300)
+    limit: int = Field(default=5, ge=1, le=10)
+
+    @field_validator("question")
+    @classmethod
+    def normalize_question(cls, value: str) -> str:
+        """Trim boundary whitespace while rejecting effectively empty questions."""
+
+        normalized = value.strip()
+        if len(normalized) < 3:
+            raise ValueError("question must contain at least 3 visible characters")
+        return normalized
+
+
+class EvidenceMatchResponse(StrictModel):
+    """One explainable source match used by future answer generation."""
+
+    node_id: str
+    kind: EvidenceNodeKind
+    name: str
+    language: str | None
+    location: SourceLocationResponse
+    confidence: Confidence
+    score: PositiveInt
+    matched_terms: list[str]
+    relationship_count: NonNegativeInt
+
+
+class EvidenceQueryResponse(StrictModel):
+    """Ranked evidence for a repository question, without generated prose."""
+
+    schema_version: Literal["1.0"] = "1.0"
+    question: str
+    matches: list[EvidenceMatchResponse]
