@@ -18,6 +18,7 @@ SymbolKind = Literal[
     "enum",
 ]
 EvidenceNodeKind = Literal["module", "symbol", "entry_point"]
+GroundingStatus = Literal["supported", "insufficient_evidence"]
 
 
 class StrictModel(BaseModel):
@@ -181,3 +182,17 @@ class EvidenceQueryResponse(StrictModel):
     schema_version: Literal["1.0"] = "1.0"
     question: str
     matches: list[EvidenceMatchResponse]
+
+
+class RepositoryAnswerRequest(EvidenceQueryRequest):
+    """Bounded repository question used to compose a grounded answer."""
+
+
+class RepositoryAnswerResponse(StrictModel):
+    """Source-grounded answer with inspectable citations."""
+
+    schema_version: Literal["1.0"] = "1.0"
+    question: str
+    answer: str
+    grounding_status: GroundingStatus
+    citations: list[EvidenceMatchResponse]

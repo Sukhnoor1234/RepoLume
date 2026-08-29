@@ -16,12 +16,16 @@ safe `503`. Repository analysis never runs inside an API request.
 
 Completed artifacts also support deterministic evidence queries. This first
 retrieval layer ranks source-located architecture nodes without calling an LLM
-or presenting generated prose as fact.
+or presenting unsupported prose as fact. The grounded-answer route turns up to
+three of those matches into a conservative summary with numbered citations and
+declines to answer when no evidence matches.
 
 The HTTP boundary is documented in the
 [repository analysis API contract](../../docs/api/repository-analysis-v1.md),
 evidence ranking is documented in
 [repository evidence retrieval](../../docs/api/repository-evidence-retrieval.md),
+grounded summaries are documented in
+[repository answers](../../docs/api/repository-grounded-answers.md),
 and persistence behavior is documented in
 [analysis job storage](../../docs/api/analysis-storage.md) and the
 [analysis request queue](../../docs/worker/analysis-queue.md).

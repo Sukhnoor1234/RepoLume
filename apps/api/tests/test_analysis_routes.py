@@ -296,6 +296,77 @@ def test_evidence_query_rejects_active_analysis() -> None:
     assert response.json()["error"]["code"] == "analysis_not_completed"
 
 
+def test_repository_answer_returns_grounded_summary_and_citations() -> None:
+    service = FakeAnalysisJobService()
+    service.snapshots["analysis_123"] = replace(
+        _QUEUED,
+        status="completed",
+        result_available=True,
+    )
+    service.architectures["analysis_123"] = _ARCHITECTURE
+
+    with _client(service) as client:
+        response = client.post(
+            "/v1/analyses/analysis_123/answer",
+            json={"question": "Where is the app module?"},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["schema_version"] == "1.0"
+    assert payload["question"] == "Where is the app module?"
+    assert payload["grounding_status"] == "supported"
+    assert payload["answer"].startswith(
+        "The strongest available source evidence points to app at app.py:1-4 [1]."
+    )
+    assert payload["citations"] == [
+        {
+            "node_id": "module:app",
+            "kind": "module",
+            "name": "app",
+            "language": "python",
+            "location": {"path": "app.py", "line": 1, "end_line": 4},
+            "confidence": "confirmed",
+            "score": 7,
+            "matched_terms": ["app", "module"],
+            "relationship_count": 1,
+        }
+    ]
+
+
+def test_repository_answer_declines_when_evidence_is_insufficient() -> None:
+    service = FakeAnalysisJobService()
+    service.snapshots["analysis_123"] = replace(
+        _QUEUED,
+        status="completed",
+        result_available=True,
+    )
+    service.architectures["analysis_123"] = _ARCHITECTURE
+
+    with _client(service) as client:
+        response = client.post(
+            "/v1/analyses/analysis_123/answer",
+            json={"question": "Where is billing?"},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["grounding_status"] == "insufficient_evidence"
+    assert response.json()["citations"] == []
+
+
+def test_repository_answer_rejects_active_analysis() -> None:
+    service = FakeAnalysisJobService()
+
+    with _client(service) as client:
+        response = client.post(
+            "/v1/analyses/analysis_123/answer",
+            json={"question": "Where is authentication?"},
+        )
+
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "analysis_not_completed"
+
+
 @pytest.mark.parametrize(
     "payload",
     [
@@ -335,6 +406,7 @@ def test_openapi_documents_analysis_contracts() -> None:
     assert document["paths"]["/v1/analyses/{analysis_id}"]["get"]
     assert document["paths"]["/v1/analyses/{analysis_id}/architecture"]["get"]
     assert document["paths"]["/v1/analyses/{analysis_id}/evidence-query"]["post"]
+    assert document["paths"]["/v1/analyses/{analysis_id}/answer"]["post"]
 
 
 def test_architecture_schema_rejects_undocumented_or_negative_values() -> None:

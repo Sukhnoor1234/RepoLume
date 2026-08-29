@@ -30,3 +30,6 @@ sequenceDiagram
 The question form is unavailable until a completed architecture is loaded. It
 does not store conversation history, send source to an LLM, stream tokens, or
 claim that evidence matches are a complete answer.
+
+Checkpoint 18 keeps this route as an inspectable retrieval contract while the
+main question panel uses the evidence to display a bounded grounded summary.

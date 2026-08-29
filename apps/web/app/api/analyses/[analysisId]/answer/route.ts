@@ -23,7 +23,7 @@ export async function POST(request: Request, context: RouteContext) {
   }
 
   return proxyApiRequest(
-    `/v1/analyses/${encodeURIComponent(analysisId)}/evidence-query`,
+    `/v1/analyses/${encodeURIComponent(analysisId)}/answer`,
     { method: "POST", body: JSON.stringify(payload) },
   );
 }

@@ -9,7 +9,9 @@ complete repository-analysis interaction. Visitors can submit a public GitHub
 URL, follow its durable analysis status, and explore a completed architecture
 artifact as an interactive, source-linked dependency graph. After completion,
 visitors can ask a repository question and inspect deterministic source matches
-before generated answers are introduced.
+inside a concise answer with numbered file and line citations. The current
+answer is a conservative static-analysis summary; model generation and chat
+history remain later work.
 
 ## Commands
 
@@ -30,4 +32,5 @@ unavailable message. The transport boundary is documented in
 experience is documented in
 [architecture explorer](../../docs/web/architecture-explorer.md). The question
 workflow is documented in
-[repository evidence search](../../docs/web/repository-evidence-search.md).
+[repository evidence search](../../docs/web/repository-evidence-search.md) and
+[grounded repository answers](../../docs/web/repository-answers.md).

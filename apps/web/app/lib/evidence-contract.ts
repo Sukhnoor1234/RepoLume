@@ -33,7 +33,7 @@ function isNonNegativeInteger(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
-function parseMatch(value: unknown): EvidenceMatch | null {
+export function parseEvidenceMatch(value: unknown): EvidenceMatch | null {
   if (!isRecord(value) || !isRecord(value.location)) return null;
   if (
     typeof value.node_id !== "string" ||
@@ -83,7 +83,7 @@ export function parseEvidenceQueryResult(value: unknown): EvidenceQueryResult | 
   ) {
     return null;
   }
-  const matches = value.matches.map(parseMatch);
+  const matches = value.matches.map(parseEvidenceMatch);
   if (matches.some((match) => match === null)) return null;
   return {
     schemaVersion: "1.0",
