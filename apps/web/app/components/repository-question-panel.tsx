@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
-import { parseEvidenceQueryResult } from "@/app/lib/evidence-contract";
+import { parseRepositoryAnswer } from "@/app/lib/answer-contract";
+import type { RepositoryAnswerResult } from "@/app/lib/answer-contract";
 import type { EvidenceMatch } from "@/app/lib/evidence-contract";
 
 type ErrorEnvelope = { error: { message: string } };
@@ -23,8 +24,7 @@ function locationLabel(match: EvidenceMatch) {
 
 export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) {
   const [question, setQuestion] = useState("");
-  const [askedQuestion, setAskedQuestion] = useState<string | null>(null);
-  const [matches, setMatches] = useState<EvidenceMatch[]>([]);
+  const [result, setResult] = useState<RepositoryAnswerResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestController = useRef<AbortController | null>(null);
@@ -41,11 +41,10 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
     requestController.current = controller;
     setSearching(true);
     setError(null);
-    setAskedQuestion(null);
-    setMatches([]);
+    setResult(null);
 
     try {
-      const response = await fetch(`/api/analyses/${analysisId}/evidence-query`, {
+      const response = await fetch(`/api/analyses/${analysisId}/answer`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ question: normalizedQuestion, limit: 5 }),
@@ -53,19 +52,18 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
       });
       const payload: unknown = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(errorMessage(payload) ?? "RepoLume could not search this architecture.");
+        setError(errorMessage(payload) ?? "RepoLume could not answer this question.");
         return;
       }
-      const result = parseEvidenceQueryResult(payload);
-      if (!result) {
-        setError("RepoLume received an invalid evidence response.");
+      const answerResult = parseRepositoryAnswer(payload);
+      if (!answerResult) {
+        setError("RepoLume received an invalid answer response.");
         return;
       }
-      setAskedQuestion(result.question);
-      setMatches(result.matches);
+      setResult(answerResult);
     } catch {
       if (!controller.signal.aborted) {
-        setError("RepoLume could not reach the evidence service.");
+        setError("RepoLume could not reach the answer service.");
       }
     } finally {
       if (!controller.signal.aborted) setSearching(false);
@@ -76,12 +74,12 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
     <section className="question-section" aria-labelledby="repository-question-heading">
       <div className="question-intro">
         <span className="map-kicker">Repository questions</span>
-        <h2 id="repository-question-heading">Find the source before generating an answer.</h2>
+        <h2 id="repository-question-heading">Ask the architecture, inspect every claim.</h2>
         <p>
-          Ask where something is implemented. RepoLume ranks evidence from the completed
-          architecture and shows exactly why each file matched.
+          RepoLume composes a cautious answer from the completed architecture and keeps the
+          supporting files and line ranges attached.
         </p>
-        <span className="retrieval-note">Evidence search · No generated answer yet</span>
+        <span className="retrieval-note">Evidence-grounded answer · Static analysis</span>
       </div>
 
       <div className="question-workspace">
@@ -98,43 +96,59 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
               required
             />
             <button type="submit" disabled={searching || question.trim().length < 3}>
-              {searching ? "Searching…" : "Find evidence"}
+              {searching ? "Tracing evidence…" : "Ask RepoLume"}
             </button>
           </div>
         </form>
 
         <div className="evidence-results" aria-live="polite">
-          {error ? <p className="analysis-notice" role="alert">{error}</p> : null}
-          {searching ? <p className="empty-evidence">Searching architecture evidence…</p> : null}
-          {askedQuestion && !error && !searching ? (
+          {error ? (
+            <p className="analysis-notice" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {searching ? <p className="empty-evidence">Tracing architecture evidence…</p> : null}
+          {result && !error && !searching ? (
             <>
               <div className="evidence-result-heading">
-                <span>Evidence for</span>
-                <strong>“{askedQuestion}”</strong>
+                <span>Answer for</span>
+                <strong>“{result.question}”</strong>
               </div>
-              {matches.length > 0 ? (
-                <ol>
-                  {matches.map((match) => (
-                    <li key={match.nodeId}>
-                      <div>
-                        <span>{match.kind.replaceAll("_", " ")}</span>
-                        <strong>{match.name}</strong>
-                      </div>
-                      <code>{locationLabel(match)}</code>
-                      <p>
-                        Matched {match.matchedTerms.join(", ")} · {match.relationshipCount}{" "}
-                        {match.relationshipCount === 1 ? "relationship" : "relationships"} · {match.confidence}
-                      </p>
-                    </li>
-                  ))}
-                </ol>
+              <div className={`grounded-answer grounding-${result.groundingStatus}`}>
+                <span>
+                  {result.groundingStatus === "supported"
+                    ? "Source evidence found"
+                    : "Not enough evidence"}
+                </span>
+                <p>{result.answer}</p>
+              </div>
+              {result.citations.length > 0 ? (
+                <div className="citation-list">
+                  <h3>Sources used</h3>
+                  <ol>
+                    {result.citations.map((match, index) => (
+                      <li key={match.nodeId}>
+                        <div>
+                          <span>[{index + 1}] · {match.kind.replaceAll("_", " ")}</span>
+                          <strong>{match.name}</strong>
+                        </div>
+                        <code>{locationLabel(match)}</code>
+                        <p>
+                          Matched {match.matchedTerms.join(", ")} · {match.relationshipCount}{" "}
+                          {match.relationshipCount === 1 ? "relationship" : "relationships"}{" "}
+                          · {match.confidence}
+                        </p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               ) : (
-                <p className="empty-evidence">No source-backed matches were found for this question.</p>
+                <p className="empty-evidence">No source citations were attached to this answer.</p>
               )}
             </>
           ) : null}
-          {!askedQuestion && !error && !searching ? (
-            <p className="empty-evidence">Your ranked source matches will appear here.</p>
+          {!result && !error && !searching ? (
+            <p className="empty-evidence">Your answer and source citations will appear here.</p>
           ) : null}
         </div>
       </div>

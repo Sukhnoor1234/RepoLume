@@ -33,6 +33,6 @@ source contents, secrets, model prompts, or generated claims are returned.
 
 Lexical matching cannot yet understand synonyms beyond the small documented
 normalization rules, conceptual questions, call behavior, or semantic meaning.
-Embeddings, source chunk retrieval, reranking, LLM answer generation,
-citations inside generated prose, chat history, and evaluation datasets remain
-later checkpoints.
+Checkpoint 18 can compose a bounded static-analysis summary from these matches.
+Embeddings, source chunk retrieval, reranking, LLM answer generation, chat
+history, and evaluation datasets remain later checkpoints.

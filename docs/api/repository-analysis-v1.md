@@ -133,6 +133,20 @@ ranges, matched terms, relationship counts, and confidence. It intentionally
 does not contain generated prose. Active or failed jobs return
 `409 analysis_not_completed`, matching architecture retrieval.
 
+## Answer a repository question
+
+`POST /v1/analyses/{analysis_id}/answer`
+
+The request uses the same bounded question and evidence limit as the retrieval
+route. The response contains a conservative answer, a grounding status, and up
+to three numbered source citations. When no architecture evidence matches, the
+API returns `insufficient_evidence`, an empty citation list, and a useful prompt
+to make the question more specific instead of guessing.
+
+The first answer composer is deterministic and does not call an external model.
+Its behavior and limitations are documented in
+[repository grounded answers](repository-grounded-answers.md).
+
 ## Error envelope
 
 Errors use one stable top-level shape:

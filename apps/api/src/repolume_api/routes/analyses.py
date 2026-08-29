@@ -21,11 +21,14 @@ from repolume_api.analysis_schemas import (
     EvidenceNodeKind,
     EvidenceQueryRequest,
     EvidenceQueryResponse,
+    RepositoryAnswerRequest,
+    RepositoryAnswerResponse,
     RepositoryArchitectureResponse,
 )
 from repolume_api.errors import APIError
-from repolume_api.evidence_retrieval import retrieve_evidence
+from repolume_api.evidence_retrieval import EvidenceMatch, retrieve_evidence
 from repolume_api.repositories import RepositoryReferenceError, normalize_repository_reference
+from repolume_api.repository_answers import compose_grounded_answer
 from repolume_api.schemas import ErrorResponse
 
 router = APIRouter(prefix="/v1/analyses", tags=["analyses"])
@@ -65,6 +68,22 @@ def _repository_response(snapshot: AnalysisJobSnapshot) -> AnalysisRepositoryRes
         repository=repository.repository,
         canonical_url=repository.canonical_url,
         ref=repository.ref,
+    )
+
+
+def _evidence_response(match: EvidenceMatch) -> EvidenceMatchResponse:
+    if match.node.location is None:
+        raise ValueError("evidence matches require source locations")
+    return EvidenceMatchResponse(
+        node_id=match.node.id,
+        kind=cast(EvidenceNodeKind, match.node.kind),
+        name=match.node.name,
+        language=match.node.language,
+        location=match.node.location,
+        confidence=match.node.confidence or "confirmed",
+        score=match.score,
+        matched_terms=list(match.matched_terms),
+        relationship_count=match.relationship_count,
     )
 
 
@@ -178,19 +197,37 @@ async def query_analysis_evidence(
     matches = retrieve_evidence(architecture, payload.question, limit=payload.limit)
     return EvidenceQueryResponse(
         question=payload.question,
-        matches=[
-            EvidenceMatchResponse(
-                node_id=match.node.id,
-                kind=cast(EvidenceNodeKind, match.node.kind),
-                name=match.node.name,
-                language=match.node.language,
-                location=match.node.location,
-                confidence=match.node.confidence or "confirmed",
-                score=match.score,
-                matched_terms=list(match.matched_terms),
-                relationship_count=match.relationship_count,
-            )
-            for match in matches
-            if match.node.location is not None
-        ],
+        matches=[_evidence_response(match) for match in matches],
+    )
+
+
+@router.post(
+    "/{analysis_id}/answer",
+    response_model=RepositoryAnswerResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Analysis not found"},
+        409: {"model": ErrorResponse, "description": "Analysis not completed"},
+        503: {"model": ErrorResponse, "description": "Analysis service unavailable"},
+    },
+    summary="Answer a repository question with source evidence",
+)
+async def answer_repository_question(
+    analysis_id: AnalysisId,
+    payload: RepositoryAnswerRequest,
+    request: Request,
+) -> RepositoryAnswerResponse:
+    """Compose a conservative answer from deterministic architecture evidence."""
+
+    try:
+        architecture = _service(request).get_architecture(analysis_id)
+    except (AnalysisServiceUnavailable, AnalysisNotFound, AnalysisNotCompleted) as exc:
+        _raise_service_error(exc)
+
+    matches = retrieve_evidence(architecture, payload.question, limit=payload.limit)
+    grounded_answer = compose_grounded_answer(payload.question, matches)
+    return RepositoryAnswerResponse(
+        question=payload.question,
+        answer=grounded_answer.text,
+        grounding_status=grounded_answer.grounding_status,
+        citations=[_evidence_response(match) for match in grounded_answer.citations],
     )

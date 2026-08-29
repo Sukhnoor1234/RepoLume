@@ -199,6 +199,8 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const submittedRepositoryUrl = String(formData.get("repository-url") ?? "").trim();
     submissionController.current?.abort();
     const controller = new AbortController();
     submissionController.current = controller;
@@ -216,7 +218,7 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
       const response = await fetch("/api/analyses", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ repository_url: repositoryUrl.trim() }),
+        body: JSON.stringify({ repository_url: submittedRepositoryUrl }),
         signal: controller.signal,
       });
       const payload = await responsePayload(response);
@@ -266,7 +268,7 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
             autoComplete="url"
             aria-describedby="repository-note repository-feedback"
           />
-          <button type="submit" disabled={submitting || repositoryUrl.trim().length === 0}>
+          <button type="submit" disabled={submitting}>
             {submitting ? "Starting…" : "Analyze repository"}
           </button>
         </div>

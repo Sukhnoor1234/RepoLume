@@ -16,8 +16,9 @@ reliable Redis Stream runtime. When explicitly configured, the API can accept a
 repository, publish its durable job, and expose the worker's persisted result.
 The web interface can now submit repositories, follow their durable analysis
 status, turn a completed result into an interactive source-linked graph, and
-rank source evidence for repository questions. Generated answers, conversation
-memory, and production deployment remain in progress.
+answer repository questions with conservative summaries backed by numbered
+source citations. Model-generated explanations, conversation memory, and
+production deployment remain in progress.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -81,8 +82,9 @@ npm run dev
 ```
 
 Set `REPOLUME_API_URL` to the FastAPI origin to enable repository submission,
-status polling, completed architecture retrieval, and evidence queries. Without
-it, the web boundary returns a safe service-unavailable response.
+status polling, completed architecture retrieval, evidence queries, and
+grounded answer summaries. Without it, the web boundary returns a safe
+service-unavailable response.
 
 ## Run the API
 

@@ -346,3 +346,32 @@ The web verification completed a production Vinext build, six rendered and
 route-level tests, ESLint, a zero-vulnerability production dependency audit,
 and desktop and mobile browser checks covering repository submission, graph
 loading, evidence querying, and source-line rendering.
+
+## Checkpoint 18
+
+Branch: `feature/repository-chat`
+
+Captured: August 28, 2026
+
+### API pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/api`
+
+Result: 145 tests passed in 5.26 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 18 API pytest results](checkpoint-18-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/worker`
+
+Result: 181 tests passed in 3.77 seconds; the live Redis and PostgreSQL
+integration tests are separated for CI.
+
+![Checkpoint 18 worker pytest results](checkpoint-18-worker-pytest.png)
+
+The web verification completed a production Vinext build, seven rendered and
+route-level tests, ESLint, a zero-vulnerability production dependency audit,
+and desktop and mobile browser checks covering repository submission, graph
+loading, grounded repository answers, and source citation rendering.

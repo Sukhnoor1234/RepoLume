@@ -489,6 +489,29 @@ h1 {
 .evidence-result-heading { display: flex; flex-direction: column; gap: 3px; }
 .evidence-result-heading span { color: #718b99; font: 9px var(--font-geist-mono), monospace; text-transform: uppercase; }
 .evidence-result-heading strong { overflow-wrap: anywhere; font-size: 13px; }
+.grounded-answer {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #31566a;
+  border-radius: 8px;
+  background: linear-gradient(145deg, rgba(83, 214, 232, 0.08), #07131d 72%);
+}
+.grounded-answer > span {
+  color: var(--cyan);
+  font: 8px var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.grounded-answer p { margin: 8px 0 0; color: #c5d8e1; font-size: 12px; line-height: 1.65; }
+.grounding-insufficient_evidence { border-color: #635534; background: #0c1820; }
+.grounding-insufficient_evidence > span { color: var(--amber); }
+.citation-list h3 {
+  margin: 16px 0 0;
+  color: #8ca6b5;
+  font: 9px var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
 .evidence-results ol { margin: 12px 0 0; padding: 0; display: grid; gap: 8px; list-style: none; }
 .evidence-results li {
   padding: 12px;
