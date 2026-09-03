@@ -89,6 +89,25 @@ status polling, completed architecture retrieval, evidence queries, and
 grounded answer summaries. Without it, the web boundary returns a safe
 service-unavailable response.
 
+## 60-second demo path
+
+For a quick portfolio walkthrough, run the web app and use one of the built-in
+sample repositories. The samples do not require a configured API or worker, so
+the first screen still shows the architecture explorer, source-linked graph,
+and cited repository answers.
+
+Suggested flow:
+
+1. Start the web app with `npm run dev` from `apps/web`.
+2. Open the local page and click **Commerce platform**.
+3. Point out that the architecture graph is generated from repository-shaped
+   analysis data, not a static mockup image.
+4. Ask: “How does an order get created?”
+5. Show the answer, cited files, and line ranges.
+
+The live repository submission path is also implemented, but it needs the API
+and worker services configured with `REPOLUME_API_URL`.
+
 ## Run the API
 
 The API foundation lives in `apps/api` and requires Python 3.12.
