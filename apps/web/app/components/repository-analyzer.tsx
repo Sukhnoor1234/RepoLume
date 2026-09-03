@@ -5,6 +5,8 @@ import type { FormEvent } from "react";
 
 import { parseArchitecture } from "@/app/lib/architecture-contract";
 import type { RepositoryArchitecture } from "@/app/lib/architecture-contract";
+import { SAMPLE_REPOSITORIES } from "@/app/lib/sample-repositories";
+import type { SampleRepository } from "@/app/lib/sample-repositories";
 
 type AnalysisStatus = "queued" | "cloning" | "analyzing" | "completed" | "failed";
 
@@ -251,6 +253,19 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
     }
   }
 
+  function loadSample(sample: SampleRepository) {
+    submissionController.current?.abort();
+    setRepositoryUrl("");
+    setSubmitting(false);
+    setNotice(null);
+    setAnalysis({
+      analysisId: sample.analysisId,
+      status: "completed",
+      resultAvailable: true,
+      failure: null,
+    });
+  }
+
   return (
     <div className="repository-preview" aria-label="Repository analyzer">
       <form onSubmit={submit}>
@@ -274,6 +289,21 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
         </div>
         <p id="repository-note">Public GitHub repositories only. Analysis runs asynchronously.</p>
       </form>
+
+      <div className="sample-repositories" aria-label="Sample repositories">
+        <span>Try a sample without waiting</span>
+        <div>
+          {SAMPLE_REPOSITORIES.map((sample) => (
+            <button key={sample.analysisId} type="button" onClick={() => loadSample(sample)}>
+              <span>
+                <strong>{sample.name}</strong>
+                <small>{sample.language}</small>
+              </span>
+              <em>{sample.description}</em>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div id="repository-feedback" className="analysis-feedback" aria-live="polite">
         {analysis ? (

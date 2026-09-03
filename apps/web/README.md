@@ -13,6 +13,10 @@ inside a concise answer with numbered file and line citations. The current
 answer is a conservative static-analysis summary; model generation and chat
 history remain later work.
 
+The web app also includes sample repositories that load through the same local
+architecture and answer contracts. They make the demo usable even when the
+live FastAPI runtime is not configured.
+
 ## Commands
 
 - `npm run dev` starts local development.
@@ -34,3 +38,5 @@ experience is documented in
 workflow is documented in
 [repository evidence search](../../docs/web/repository-evidence-search.md) and
 [grounded repository answers](../../docs/web/repository-answers.md).
+The no-wait sample flow is documented in
+[sample repositories](../../docs/web/sample-repositories.md).

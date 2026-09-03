@@ -168,6 +168,67 @@ h1 {
 .repository-controls button:focus-visible { outline: 3px solid rgba(83, 214, 232, 0.25); }
 .repository-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
 .repository-preview p { margin: 9px 0 0; color: #6f8998; font-size: 11px; }
+.sample-repositories {
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid var(--border);
+}
+.sample-repositories > span {
+  display: block;
+  margin-bottom: 9px;
+  color: #8ca6b5;
+  font: 9px var(--font-geist-mono), monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.sample-repositories > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.sample-repositories button {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #24475a;
+  border-radius: 8px;
+  color: var(--foreground);
+  background: #07131d;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.sample-repositories button:hover,
+.sample-repositories button:focus-visible {
+  border-color: var(--cyan);
+  background: #0c2230;
+}
+.sample-repositories button span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sample-repositories strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sample-repositories small {
+  flex: 0 0 auto;
+  color: var(--cyan);
+  font: 8px var(--font-geist-mono), monospace;
+  text-transform: uppercase;
+}
+.sample-repositories em {
+  display: block;
+  margin-top: 7px;
+  color: #7793a2;
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1.45;
+}
 .analysis-feedback:empty { display: none; }
 .analysis-progress, .analysis-notice {
   margin-top: 13px;
@@ -561,6 +622,7 @@ h1 {
   .hero { padding: 50px 0 58px; gap: 48px; }
   h1 { font-size: 48px; }
   .repository-controls { flex-direction: column; }
+  .sample-repositories > div { grid-template-columns: 1fr; }
   .hero-details { flex-wrap: wrap; gap: 10px 16px; }
   .architecture-map { height: 390px; }
   .live-map-shell { height: auto; grid-template-columns: 1fr; }
