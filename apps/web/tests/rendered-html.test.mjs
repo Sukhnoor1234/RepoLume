@@ -29,6 +29,9 @@ test("server-renders the RepoLume analysis entry point", async () => {
   assert.match(html, /commerce-platform/);
   assert.match(html, /Public GitHub repositories only/);
   assert.match(html, /Analyze repository/);
+  assert.match(html, /Try a sample without waiting/);
+  assert.match(html, /Commerce platform/);
+  assert.match(html, /Task API/);
   assert.doesNotMatch(html, /Starter Project|loading skeleton/i);
 });
 
@@ -77,6 +80,8 @@ test("connects the repository form through same-origin analysis routes", async (
   assert.match(experience, /<RepositoryQuestionPanel analysisId=/);
   assert.match(component, /onSubmit=\{submit\}/);
   assert.match(component, /fetch\("\/api\/analyses"/);
+  assert.match(component, /SAMPLE_REPOSITORIES/);
+  assert.match(component, /loadSample/);
   assert.match(component, /\/architecture`/);
   assert.match(component, /aria-live="polite"/);
   assert.doesNotMatch(component, /REPOLUME_API_URL|dangerouslySetInnerHTML/);
@@ -148,6 +153,30 @@ test("fails closed when the analysis API is not configured", async () => {
       message: "Repository analysis is temporarily unavailable.",
     },
   });
+});
+
+test("serves sample repository architecture and answers without API configuration", async () => {
+  const status = await request("/api/analyses/sample_commerce_platform");
+  const architecture = await request("/api/analyses/sample_commerce_platform/architecture");
+  const answer = await request("/api/analyses/sample_commerce_platform/answer", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ question: "How does an order get created?", limit: 5 }),
+  });
+  const evidence = await request("/api/analyses/sample_commerce_platform/evidence-query", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ question: "How does an order get created?", limit: 5 }),
+  });
+
+  assert.equal(status.status, 200);
+  assert.equal((await status.json()).result_available, true);
+  assert.equal(architecture.status, 200);
+  assert.equal((await architecture.json()).summary.node_count, 6);
+  assert.equal(answer.status, 200);
+  assert.match((await answer.json()).answer, /createOrder/);
+  assert.equal(evidence.status, 200);
+  assert.equal((await evidence.json()).matches[0].location.path, "src/services/orders.ts");
 });
 
 test("proxies submission, status, and architecture through the configured API origin", async () => {

@@ -17,8 +17,10 @@ repository, publish its durable job, and expose the worker's persisted result.
 The web interface can now submit repositories, follow their durable analysis
 status, turn a completed result into an interactive source-linked graph, and
 answer repository questions with conservative summaries backed by numbered
-source citations. Model-generated explanations, conversation memory, and
-production deployment remain in progress.
+source citations. It also includes sample repositories that load instantly for
+reviewers who want to try the product before a live analysis service is
+configured. Model-generated explanations, conversation memory, and production
+deployment remain in progress.
 
 Development is intentionally milestone-based. Each checkpoint is reviewed and
 verified before the next layer of the system is added.
@@ -43,7 +45,8 @@ The first public version will focus on one reliable workflow:
    relationships.
 4. Ask repository questions and receive answers grounded in cited files and
    line ranges.
-5. Trace supported request flows and estimate the impact of changing or
+5. Load sample repositories without signing up or waiting for a worker.
+6. Trace supported request flows and estimate the impact of changing or
    removing a file.
 
 The initial analyzer will support TypeScript/JavaScript and Python. Results

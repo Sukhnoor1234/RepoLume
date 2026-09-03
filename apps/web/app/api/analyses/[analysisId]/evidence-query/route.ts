@@ -1,6 +1,7 @@
 import { isAnalysisId } from "@/app/lib/analysis-id";
 import { invalidRequest, proxyApiRequest } from "@/app/lib/repolume-api";
 import { isRepositoryQuestion } from "@/app/lib/repository-question";
+import { getSampleAnswer } from "@/app/lib/sample-repositories";
 
 type RouteContext = {
   params: Promise<{ analysisId: string }>;
@@ -20,6 +21,17 @@ export async function POST(request: Request, context: RouteContext) {
   }
   if (!isRepositoryQuestion(payload)) {
     return invalidRequest("Ask a question between 3 and 300 characters.");
+  }
+  const sampleAnswer = getSampleAnswer(analysisId, payload);
+  if (sampleAnswer) {
+    return Response.json(
+      {
+        schema_version: "1.0",
+        question: sampleAnswer.question,
+        matches: sampleAnswer.citations,
+      },
+      { headers: { "cache-control": "no-store" } },
+    );
   }
 
   return proxyApiRequest(
