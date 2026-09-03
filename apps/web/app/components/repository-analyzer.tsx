@@ -292,6 +292,7 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
 
       <div className="sample-repositories" aria-label="Sample repositories">
         <span>Try a sample without waiting</span>
+        <p>Good for a quick walkthrough when the live analysis worker is not running.</p>
         <div>
           {SAMPLE_REPOSITORIES.map((sample) => (
             <button key={sample.analysisId} type="button" onClick={() => loadSample(sample)}>
@@ -300,6 +301,7 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
                 <small>{sample.language}</small>
               </span>
               <em>{sample.description}</em>
+              <span className="sample-question">Ask: {sample.suggestedQuestion}</span>
             </button>
           ))}
         </div>

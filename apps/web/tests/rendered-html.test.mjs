@@ -30,8 +30,11 @@ test("server-renders the RepoLume analysis entry point", async () => {
   assert.match(html, /Public GitHub repositories only/);
   assert.match(html, /Analyze repository/);
   assert.match(html, /Try a sample without waiting/);
+  assert.match(html, /quick walkthrough when the live analysis worker is not running/);
   assert.match(html, /Commerce platform/);
   assert.match(html, /Task API/);
+  assert.match(html, /How does an order get created\?/);
+  assert.match(html, /Where is user authentication checked\?/);
   assert.doesNotMatch(html, /Starter Project|loading skeleton/i);
 });
 

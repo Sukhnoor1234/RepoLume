@@ -404,3 +404,31 @@ The web verification completed a production Vinext build, eight rendered and
 route-level tests, ESLint, and a zero-vulnerability production dependency
 audit. Browser automation was not used for this checkpoint because the local
 preview URL was blocked by the browser controller policy during verification.
+
+## Checkpoint 20
+
+Branch: `feature/demo-polish`
+
+Captured: September 2, 2026
+
+### API pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/api`
+
+Result: 145 tests passed in 2.93 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 20 API pytest results](checkpoint-20-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/worker`
+
+Result: 181 tests passed in 4.54 seconds; the live Redis and PostgreSQL
+integration tests are separated for CI.
+
+![Checkpoint 20 worker pytest results](checkpoint-20-worker-pytest.png)
+
+The web verification completed a production Vinext build, eight rendered and
+route-level tests, ESLint, and a zero-vulnerability production dependency
+audit.
