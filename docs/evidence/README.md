@@ -432,3 +432,33 @@ integration tests are separated for CI.
 The web verification completed a production Vinext build, eight rendered and
 route-level tests, ESLint, and a zero-vulnerability production dependency
 audit.
+
+## Checkpoint 21
+
+Branch: `feature/local-analysis-flow`
+
+Captured: September 3, 2026
+
+### API pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/api`
+
+Result: 145 tests passed in 2.85 seconds; the live Redis integration test is
+separated for CI.
+
+![Checkpoint 21 API pytest results](checkpoint-21-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/worker`
+
+Result: 182 tests passed in 1.85 seconds; the live Redis and PostgreSQL
+integration tests are separated for CI.
+
+![Checkpoint 21 worker pytest results](checkpoint-21-worker-pytest.png)
+
+The web verification completed a production Vinext build, eight rendered and
+route-level tests, ESLint, API Ruff, worker Ruff, and Docker Compose config
+validation. The production dependency audit was attempted, but the registry
+call did not return useful output before it was stopped; package files were not
+changed in this checkpoint.

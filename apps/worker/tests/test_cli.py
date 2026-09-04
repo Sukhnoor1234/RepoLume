@@ -64,6 +64,31 @@ def test_once_reports_safe_result(monkeypatch: pytest.MonkeyPatch) -> None:
     assert "secret" not in output.getvalue()
 
 
+def test_loop_delegates_to_long_running_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv(
+        "REPOLUME_DATABASE_URL",
+        "postgresql+psycopg://worker:secret@localhost/repolume",
+    )
+    monkeypatch.setenv("REPOLUME_REDIS_URL", "redis://worker:secret@localhost:6379/0")
+    monkeypatch.setattr(
+        cli_module,
+        "run_loop_from_environment",
+        lambda output=None: print(
+            json.dumps({"event": "worker.loop.started", "leaked": False}),
+            file=output,
+        )
+        or 0,
+    )
+    output = StringIO()
+
+    assert main(["--loop"], output=output) == 0
+    assert json.loads(output.getvalue()) == {
+        "event": "worker.loop.started",
+        "leaked": False,
+    }
+    assert "secret" not in output.getvalue()
+
+
 def test_partial_runtime_configuration_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("REPOLUME_DATABASE_URL", "private-value")
 

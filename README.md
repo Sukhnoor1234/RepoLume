@@ -73,6 +73,8 @@ the product develops.
 RepoLume will use a monorepo containing independently deployable web, API, and
 analysis-worker applications. The decision and its tradeoffs are recorded in
 [ADR 0001](docs/decisions/0001-monorepo-architecture.md).
+The local development runtime is documented in
+[ADR 0011](docs/decisions/0011-local-development-runtime.md).
 
 ## Run the web application
 
@@ -107,6 +109,9 @@ Suggested flow:
 
 The live repository submission path is also implemented, but it needs the API
 and worker services configured with `REPOLUME_API_URL`.
+
+For the complete local flow with PostgreSQL, Redis, the API, the worker, and
+the web app running together, use the [local development runbook](docs/local-development.md).
 
 ## Run the API
 
@@ -147,7 +152,8 @@ python -m repolume_worker --check
 The readiness command validates configuration without connecting. A
 configured worker can process one recovered or new request with
 `python -m repolume_worker --once`. Bounded one-message execution is intentional
-until deployment adds a supervised long-running process.
+for CI and debugging. For local demos, use `python -m repolume_worker --loop`
+so the worker keeps processing submitted repositories until you stop it.
 
 ## Development workflow
 
