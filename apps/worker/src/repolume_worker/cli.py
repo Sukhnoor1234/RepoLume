@@ -34,6 +34,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="process at most one recovered or new analysis request",
     )
+    commands.add_argument(
+        "--loop",
+        action="store_true",
+        help="keep processing analysis requests until interrupted",
+    )
     return parser
 
 
@@ -73,6 +78,67 @@ def run_once_from_environment() -> WorkerRunResult:
         engine.dispose()
 
 
+def run_loop_from_environment(output: TextIO | None = None) -> int:
+    """Process repository analyses continuously until the operator stops the worker."""
+
+    database_settings = WorkerDatabaseSettings.from_environment()
+    queue_settings = WorkerQueueSettings.from_environment()
+    engine = create_database_engine(database_settings)
+    redis = create_redis_client(queue_settings)
+    consumer_name = getenv("REPOLUME_WORKER_CONSUMER", "worker-1")
+    destination = output or sys.stdout
+    environment = WorkerSettings.from_environment().environment
+    try:
+        queue = RedisAnalysisQueue(
+            redis,
+            stream_name=queue_settings.stream_name,
+            consumer_group=queue_settings.consumer_group,
+            claim_idle_ms=queue_settings.claim_idle_ms,
+        )
+        storage = WorkerAnalysisStorage(engine)
+        with GitHubRepositoryRetriever() as retriever:
+            runtime = AnalysisWorkerRuntime(
+                queue,
+                storage,
+                RepositoryAnalysisPipeline(retriever),
+            )
+            while True:
+                result = runtime.process_once(consumer_name, block_ms=5_000)
+                print(
+                    json.dumps(
+                        {
+                            "event": "worker.run_once",
+                            "service": "repolume-worker",
+                            "version": __version__,
+                            "environment": environment,
+                            "outcome": result.outcome,
+                            "analysis_id": result.analysis_id,
+                        },
+                        sort_keys=True,
+                    ),
+                    file=destination,
+                    flush=True,
+                )
+    except KeyboardInterrupt:
+        print(
+            json.dumps(
+                {
+                    "event": "worker.stopped",
+                    "service": "repolume-worker",
+                    "version": __version__,
+                    "environment": environment,
+                },
+                sort_keys=True,
+            ),
+            file=destination,
+            flush=True,
+        )
+        return 0
+    finally:
+        redis.close()
+        engine.dispose()
+
+
 def main(argv: Sequence[str] | None = None, output: TextIO | None = None) -> int:
     """Run a readiness check or one bounded analysis delivery."""
 
@@ -92,7 +158,7 @@ def main(argv: Sequence[str] | None = None, output: TextIO | None = None) -> int
             "environment": settings.environment,
             "queue_backend": "redis_streams" if configured else "not_configured",
         }
-    else:
+    elif args.once:
         if not configured:
             parser.error("--once requires the database and Redis runtime configuration")
         result = run_once_from_environment()
@@ -104,6 +170,10 @@ def main(argv: Sequence[str] | None = None, output: TextIO | None = None) -> int
             "outcome": result.outcome,
             "analysis_id": result.analysis_id,
         }
+    else:
+        if not configured:
+            parser.error("--loop requires the database and Redis runtime configuration")
+        return run_loop_from_environment(output)
     print(json.dumps(payload, sort_keys=True), file=output or sys.stdout)
     return 0
 
