@@ -73,11 +73,13 @@ def test_loop_delegates_to_long_running_runtime(monkeypatch: pytest.MonkeyPatch)
     monkeypatch.setattr(
         cli_module,
         "run_loop_from_environment",
-        lambda output=None: print(
-            json.dumps({"event": "worker.loop.started", "leaked": False}),
-            file=output,
-        )
-        or 0,
+        lambda output=None: (
+            print(
+                json.dumps({"event": "worker.loop.started", "leaked": False}),
+                file=output,
+            )
+            or 0
+        ),
     )
     output = StringIO()
 
