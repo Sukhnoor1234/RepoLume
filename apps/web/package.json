@@ -14,7 +14,7 @@
     "deploy:worker": "wrangler deploy --config dist/server/wrangler.json",
     "smoke": "node scripts/smoke-test.mjs",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern .tmp"
   },
   "dependencies": {
     "@xyflow/react": "12.11.3",

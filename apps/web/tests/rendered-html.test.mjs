@@ -21,6 +21,12 @@ test("server-renders the RepoLume analysis entry point", async () => {
   const response = await request("/", { headers: { accept: "text/html" } });
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
+  assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
+  assert.match(response.headers.get("permissions-policy") ?? "", /camera=\(\)/);
+  assert.match(response.headers.get("strict-transport-security") ?? "", /max-age=31536000/);
 
   const html = await response.text();
   assert.match(html, /<title>RepoLume — AI Architecture Explorer<\/title>/i);
