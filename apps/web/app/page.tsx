@@ -1,6 +1,11 @@
 import { AnalysisExperience } from "@/app/components/analysis-experience";
+import { isLiveAnalysisEnabled } from "@/app/lib/repolume-runtime";
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
+  const liveAnalysisEnabled = isLiveAnalysisEnabled();
+
   return (
     <main>
       <nav className="site-nav" aria-label="Primary navigation">
@@ -17,7 +22,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <AnalysisExperience />
+      <AnalysisExperience liveAnalysisEnabled={liveAnalysisEnabled} />
 
       <section className="principles" id="how-it-works">
         <article>

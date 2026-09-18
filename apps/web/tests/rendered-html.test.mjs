@@ -27,10 +27,10 @@ test("server-renders the RepoLume analysis entry point", async () => {
   assert.match(html, /Understand any codebase before you touch it\./);
   assert.match(html, /AI architecture explorer/i);
   assert.match(html, /commerce-platform/);
-  assert.match(html, /Public GitHub repositories only/);
-  assert.match(html, /Analyze repository/);
+  assert.match(html, /Public demo mode/);
+  assert.match(html, /Live analysis offline/);
   assert.match(html, /Try a sample without waiting/);
-  assert.match(html, /quick walkthrough when the live analysis worker is not running/);
+  assert.match(html, /examples include the architecture map and source-cited answers/i);
   assert.match(html, /Commerce platform/);
   assert.match(html, /Task API/);
   assert.match(html, /How does an order get created\?/);
@@ -77,8 +77,9 @@ test("connects the repository form through same-origin analysis routes", async (
     "utf8",
   );
 
-  assert.match(page, /<AnalysisExperience \/>/);
-  assert.match(experience, /<RepositoryAnalyzer onArchitectureChange=/);
+  assert.match(page, /<AnalysisExperience liveAnalysisEnabled=/);
+  assert.match(experience, /liveAnalysisEnabled=\{liveAnalysisEnabled\}/);
+  assert.match(experience, /onArchitectureChange=\{updateDisplay\}/);
   assert.match(experience, /<ArchitecturePanel display=/);
   assert.match(experience, /<RepositoryQuestionPanel analysisId=/);
   assert.match(component, /onSubmit=\{submit\}/);
@@ -103,6 +104,18 @@ test("connects the repository form through same-origin analysis routes", async (
   );
   assert.match(evidenceRoute, /evidence-query`/);
   assert.match(answerRoute, /answer`/);
+});
+
+test("reports public demo readiness without exposing configuration", async () => {
+  const response = await request("/api/health");
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+  assert.deepEqual(await response.json(), {
+    status: "ok",
+    service: "repolume-web",
+    live_analysis_enabled: false,
+  });
 });
 
 test("rejects malformed repository submissions at the web boundary", async () => {

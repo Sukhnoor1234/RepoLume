@@ -14,7 +14,11 @@ const EMPTY_ARCHITECTURE: ArchitectureDisplayState = {
   error: null,
 };
 
-export function AnalysisExperience() {
+type AnalysisExperienceProps = {
+  liveAnalysisEnabled: boolean;
+};
+
+export function AnalysisExperience({ liveAnalysisEnabled }: AnalysisExperienceProps) {
   const [display, setDisplay] = useState<ArchitectureDisplayState>(EMPTY_ARCHITECTURE);
   const updateDisplay = useCallback((next: ArchitectureDisplayState) => setDisplay(next), []);
 
@@ -33,7 +37,10 @@ export function AnalysisExperience() {
             in the source code.
           </p>
 
-          <RepositoryAnalyzer onArchitectureChange={updateDisplay} />
+          <RepositoryAnalyzer
+            liveAnalysisEnabled={liveAnalysisEnabled}
+            onArchitectureChange={updateDisplay}
+          />
 
           <div className="hero-details" aria-label="Initial product scope">
             <span>TypeScript</span>

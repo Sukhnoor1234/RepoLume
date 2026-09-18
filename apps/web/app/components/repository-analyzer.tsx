@@ -27,6 +27,7 @@ export type ArchitectureDisplayState = {
 };
 
 type RepositoryAnalyzerProps = {
+  liveAnalysisEnabled: boolean;
   onArchitectureChange: (state: ArchitectureDisplayState) => void;
 };
 
@@ -86,7 +87,10 @@ async function responsePayload(response: Response): Promise<unknown> {
   }
 }
 
-export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerProps) {
+export function RepositoryAnalyzer({
+  liveAnalysisEnabled,
+  onArchitectureChange,
+}: RepositoryAnalyzerProps) {
   const [repositoryUrl, setRepositoryUrl] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -201,6 +205,7 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!liveAnalysisEnabled) return;
     const formData = new FormData(event.currentTarget);
     const submittedRepositoryUrl = String(formData.get("repository-url") ?? "").trim();
     submissionController.current?.abort();
@@ -268,6 +273,12 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
 
   return (
     <div className="repository-preview" aria-label="Repository analyzer">
+      {!liveAnalysisEnabled ? (
+        <div className="demo-mode-note" role="status">
+          <strong>Public demo mode</strong>
+          <span>Choose a sample below to explore RepoLume without waiting.</span>
+        </div>
+      ) : null}
       <form onSubmit={submit}>
         <label htmlFor="repository-url">Public GitHub repository</label>
         <div className="repository-controls">
@@ -278,21 +289,34 @@ export function RepositoryAnalyzer({ onArchitectureChange }: RepositoryAnalyzerP
             placeholder="https://github.com/owner/repository"
             value={repositoryUrl}
             onChange={(event) => setRepositoryUrl(event.target.value)}
-            required
+            required={liveAnalysisEnabled}
+            disabled={!liveAnalysisEnabled}
             maxLength={2048}
             autoComplete="url"
             aria-describedby="repository-note repository-feedback"
           />
-          <button type="submit" disabled={submitting}>
-            {submitting ? "Starting…" : "Analyze repository"}
+          <button type="submit" disabled={submitting || !liveAnalysisEnabled}>
+            {submitting
+              ? "Starting…"
+              : liveAnalysisEnabled
+                ? "Analyze repository"
+                : "Live analysis offline"}
           </button>
         </div>
-        <p id="repository-note">Public GitHub repositories only. Analysis runs asynchronously.</p>
+        <p id="repository-note">
+          {liveAnalysisEnabled
+            ? "Public GitHub repositories only. Analysis runs asynchronously."
+            : "The hosted demo uses built-in samples. The full repository flow is verified locally."}
+        </p>
       </form>
 
       <div className="sample-repositories" aria-label="Sample repositories">
         <span>Try a sample without waiting</span>
-        <p>Good for a quick walkthrough when the live analysis worker is not running.</p>
+        <p>
+          {liveAnalysisEnabled
+            ? "Good for a quick walkthrough without waiting for a new analysis."
+            : "These examples include the architecture map and source-cited answers."}
+        </p>
         <div>
           {SAMPLE_REPOSITORIES.map((sample) => (
             <button key={sample.analysisId} type="button" onClick={() => loadSample(sample)}>
