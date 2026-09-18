@@ -15,6 +15,8 @@ _OWNER = re.compile(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?", re.ASCII)
 _REPOSITORY = re.compile(r"[A-Za-z0-9._-]{1,100}", re.ASCII)
 _REF = re.compile(r"[A-Za-z0-9._/-]{1,255}", re.ASCII)
 _CONSUMER_NAME = re.compile(r"[A-Za-z0-9_.-]{1,64}", re.ASCII)
+_MAX_BLOCK_MS = 60_000
+_SOCKET_TIMEOUT_SECONDS = (_MAX_BLOCK_MS // 1_000) + 5
 
 
 class QueueMessageError(ValueError):
@@ -164,7 +166,7 @@ class RedisAnalysisQueue:
         block_ms: int = 5_000,
     ) -> tuple[AnalysisQueueMessage, ...]:
         self._validate_request(consumer_name, count)
-        if not 0 <= block_ms <= 60_000:
+        if not 0 <= block_ms <= _MAX_BLOCK_MS:
             raise ValueError("queue block time must be between 0 and 60000 milliseconds")
         response = self._redis.xreadgroup(
             self._consumer_group,
@@ -282,5 +284,5 @@ def create_redis_client(settings: WorkerQueueSettings) -> Redis:
         settings.url,
         decode_responses=True,
         socket_connect_timeout=5,
-        socket_timeout=5,
+        socket_timeout=_SOCKET_TIMEOUT_SECONDS,
     )

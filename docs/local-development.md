@@ -58,9 +58,13 @@ In another terminal:
 
 ```powershell
 cd apps/web
-$env:REPOLUME_API_URL = "http://localhost:8000"
+Copy-Item .dev.vars.example .dev.vars
 npm run dev
 ```
+
+Vinext runs the app in Cloudflare's local worker runtime, so local server
+bindings come from the ignored `.dev.vars` file. The checked-in example points
+to the local FastAPI service and contains no secret values.
 
 Open `http://localhost:3000`, paste a public GitHub repository URL, and click
 **Analyze repository**.

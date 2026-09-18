@@ -1,0 +1,81 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description">
+  <title id="title">RepoLume</title>
+  <desc id="description">RepoLume turns source code into an interactive, evidence-linked architecture map.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1200" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06131C"/>
+      <stop offset="0.55" stop-color="#09202C"/>
+      <stop offset="1" stop-color="#071821"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="115" y1="80" x2="470" y2="285" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#53D6E8"/>
+      <stop offset="1" stop-color="#8DE8C3"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#234352" stroke-width="1" opacity="0.24"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="360" rx="24" fill="url(#background)"/>
+  <rect width="1200" height="360" rx="24" fill="url(#grid)"/>
+  <rect x="1" y="1" width="1198" height="358" rx="23" stroke="#2D5667" stroke-width="2"/>
+
+  <circle cx="78" cy="73" r="27" fill="#0C2A38" stroke="#53D6E8" stroke-width="2"/>
+  <text x="78" y="80" text-anchor="middle" fill="#EAF7FA" font-family="Arial, sans-serif" font-size="17" font-weight="700">RL</text>
+  <text x="119" y="79" fill="#7EDDEC" font-family="Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="2">AI ARCHITECTURE EXPLORER</text>
+
+  <text x="68" y="166" fill="#F4F8FA" font-family="Arial, sans-serif" font-size="62" font-weight="700" letter-spacing="-2">RepoLume</text>
+  <rect x="70" y="184" width="350" height="4" rx="2" fill="url(#accent)"/>
+  <text x="70" y="231" fill="#C9DDE5" font-family="Arial, sans-serif" font-size="25">Understand any codebase</text>
+  <text x="70" y="265" fill="#C9DDE5" font-family="Arial, sans-serif" font-size="25">before you touch it.</text>
+  <text x="70" y="310" fill="#7999A7" font-family="Arial, sans-serif" font-size="15">SOURCE CODE  →  SYSTEM MAP  →  CITED ANSWERS</text>
+
+  <path d="M705 92H776" stroke="#53D6E8" stroke-width="2" opacity="0.8"/>
+  <path d="M875 126V177" stroke="#53D6E8" stroke-width="2" opacity="0.8"/>
+  <path d="M967 218H1027" stroke="#F1BD70" stroke-width="2" stroke-dasharray="7 7" opacity="0.9"/>
+  <path d="M774 218H714" stroke="#53D6E8" stroke-width="2" opacity="0.8"/>
+  <circle cx="741" cy="92" r="4" fill="#53D6E8" filter="url(#glow)"/>
+  <circle cx="875" cy="151" r="4" fill="#53D6E8" filter="url(#glow)"/>
+  <circle cx="997" cy="218" r="4" fill="#F1BD70" filter="url(#glow)"/>
+
+  <g>
+    <rect x="560" y="61" width="145" height="63" rx="12" fill="#0C2633" stroke="#376579"/>
+    <text x="579" y="85" fill="#7196A6" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">REPOSITORY</text>
+    <text x="579" y="108" fill="#ECF7FA" font-family="Arial, sans-serif" font-size="16" font-weight="700">Source Code</text>
+  </g>
+  <g>
+    <rect x="776" y="61" width="198" height="63" rx="12" fill="#0C2633" stroke="#53D6E8"/>
+    <text x="795" y="85" fill="#7EDDEC" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">STATIC ANALYSIS</text>
+    <text x="795" y="108" fill="#ECF7FA" font-family="Arial, sans-serif" font-size="16" font-weight="700">AST + Tree-sitter</text>
+  </g>
+  <g>
+    <rect x="774" y="177" width="193" height="82" rx="14" fill="#0B2B38" stroke="#53D6E8" stroke-width="2"/>
+    <text x="795" y="204" fill="#7EDDEC" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.4">INTERACTIVE MAP</text>
+    <text x="795" y="229" fill="#F4F9FA" font-family="Arial, sans-serif" font-size="18" font-weight="700">Architecture Graph</text>
+    <text x="795" y="247" fill="#7696A4" font-family="Arial, sans-serif" font-size="11">modules · symbols · dependencies</text>
+  </g>
+  <g>
+    <rect x="1027" y="187" width="128" height="63" rx="12" fill="#292617" stroke="#F1BD70"/>
+    <text x="1045" y="211" fill="#F1BD70" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.2">EVIDENCE</text>
+    <text x="1045" y="235" fill="#FFF8EA" font-family="Arial, sans-serif" font-size="16" font-weight="700">Cited Answers</text>
+  </g>
+  <g>
+    <rect x="560" y="187" width="154" height="63" rx="12" fill="#102820" stroke="#70D8AC"/>
+    <text x="578" y="211" fill="#70D8AC" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.2">DURABLE JOB</text>
+    <text x="578" y="235" fill="#EDFFF7" font-family="Arial, sans-serif" font-size="16" font-weight="700">Worker Pipeline</text>
+  </g>
+
+  <rect x="560" y="290" width="97" height="31" rx="15.5" fill="#0C2633" stroke="#315565"/>
+  <text x="608.5" y="310" text-anchor="middle" fill="#A9CBD7" font-family="Arial, sans-serif" font-size="12" font-weight="700">TypeScript</text>
+  <rect x="669" y="290" width="77" height="31" rx="15.5" fill="#0C2633" stroke="#315565"/>
+  <text x="707.5" y="310" text-anchor="middle" fill="#A9CBD7" font-family="Arial, sans-serif" font-size="12" font-weight="700">Python</text>
+  <rect x="758" y="290" width="112" height="31" rx="15.5" fill="#0C2633" stroke="#315565"/>
+  <text x="814" y="310" text-anchor="middle" fill="#A9CBD7" font-family="Arial, sans-serif" font-size="12" font-weight="700">Source-linked</text>
+</svg>

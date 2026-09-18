@@ -91,6 +91,7 @@ test("connects the repository form through same-origin analysis routes", async (
   assert.match(panel, /dynamic\(/);
   assert.match(explorer, /<ReactFlow/);
   assert.match(explorer, /source evidence/i);
+  assert.match(explorer, /dependencyCount, "dependency", "dependencies"/);
   assert.match(questionPanel, /Ask RepoLume/);
   assert.match(questionPanel, /parseRepositoryAnswer/);
   assert.match(questionPanel, /Sources used/);
