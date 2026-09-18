@@ -9,6 +9,10 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
+    "deploy": "npm run build && npm run deploy:worker",
+    "deploy:dry-run": "npm run build && wrangler deploy --dry-run --config dist/server/wrangler.json --outdir .tmp/deploy",
+    "deploy:worker": "wrangler deploy --config dist/server/wrangler.json",
+    "smoke": "node scripts/smoke-test.mjs",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },

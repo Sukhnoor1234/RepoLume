@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-const API_URL_ENVIRONMENT_VARIABLE = "REPOLUME_API_URL";
+import { analysisApiBaseUrl } from "@/app/lib/repolume-runtime";
+
 const MAXIMUM_RESPONSE_BYTES = 1_000_000;
 
 type ErrorEnvelope = {
@@ -17,29 +18,8 @@ function errorResponse(status: number, code: string, message: string) {
   );
 }
 
-function apiBaseUrl(): URL | null {
-  const configuredUrl = process.env[API_URL_ENVIRONMENT_VARIABLE];
-  if (!configuredUrl) return null;
-
-  try {
-    const url = new URL(configuredUrl);
-    if (
-      !["http:", "https:"].includes(url.protocol) ||
-      url.username ||
-      url.password ||
-      url.search ||
-      url.hash
-    ) {
-      return null;
-    }
-    return url;
-  } catch {
-    return null;
-  }
-}
-
 export async function proxyApiRequest(path: string, init?: RequestInit) {
-  const baseUrl = apiBaseUrl();
+  const baseUrl = analysisApiBaseUrl();
   if (!baseUrl) {
     return errorResponse(
       503,

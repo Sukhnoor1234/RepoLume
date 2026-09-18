@@ -2,6 +2,9 @@
 
 This directory contains the RepoLume web application.
 
+Live sample-first demo:
+[`repolume-web.sukhnoor-repolume.workers.dev`](https://repolume-web.sukhnoor-repolume.workers.dev)
+
 ## Current milestone
 
 The current version includes the responsive product foundation and the first
@@ -17,10 +20,17 @@ The web app also includes sample repositories that load through the same local
 architecture and answer contracts. They make the demo usable even when the
 live FastAPI runtime is not configured.
 
+When the API URL is absent, the interface identifies itself as a public demo,
+disables live repository submission, and directs reviewers to the working
+samples instead of presenting a broken upload flow.
+
 ## Commands
 
 - `npm run dev` starts local development.
 - `npm run build` creates the production worker build.
+- `npm run deploy:dry-run` validates the Cloudflare deployment bundle locally.
+- `npm run deploy` builds and publishes the web worker after Wrangler login.
+- `npm run smoke -- <url>` verifies a deployed page, health check, and sample.
 - `npm run lint` checks the source with ESLint.
 - `npm test` builds the application and verifies the rendered HTML.
 
@@ -41,3 +51,5 @@ workflow is documented in
 [grounded repository answers](../../docs/web/repository-answers.md).
 The no-wait sample flow is documented in
 [sample repositories](../../docs/web/sample-repositories.md).
+Public hosting is documented in
+[public demo deployment](../../docs/public-demo-deployment.md).

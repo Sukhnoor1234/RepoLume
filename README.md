@@ -7,6 +7,10 @@
 </p>
 
 <p align="center">
+  <a href="https://repolume-web.sukhnoor-repolume.workers.dev"><strong>Open the live demo →</strong></a>
+</p>
+
+<p align="center">
   <a href="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/web-ci.yml"><img src="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/web-ci.yml/badge.svg" alt="Web checks" /></a>
   <a href="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/api-ci.yml"><img src="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/api-ci.yml/badge.svg" alt="API checks" /></a>
   <a href="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/worker-ci.yml"><img src="https://github.com/Sukhnoor1234/RepoLume/actions/workflows/worker-ci.yml/badge.svg" alt="Worker checks" /></a>
@@ -36,10 +40,10 @@ question such as _“Where is signing implemented?”_ and inspect the exact fil
 and line range behind the answer.
 
 > RepoLume is under active development. Static analysis, durable background
-> jobs, the interactive explorer, built-in samples, and evidence-grounded
-> repository questions work today. Model-generated explanations, hosted
-> deployment, security insights, and maintainability scoring are on the
-> roadmap.
+> jobs, the interactive explorer, built-in samples, evidence-grounded
+> repository questions, and a hosted sample-first demo work today.
+> Model-generated explanations, hosted live analysis, security insights, and
+> maintainability scoring are on the roadmap.
 
 ## Why RepoLume?
 
@@ -109,7 +113,11 @@ Architecture choices and tradeoffs are recorded as
 
 ## Try the 60-second demo
 
-The built-in examples work without PostgreSQL, Redis, or the API:
+Open the [live RepoLume demo](https://repolume-web.sukhnoor-repolume.workers.dev)
+and select **Commerce platform**. The built-in examples work without
+PostgreSQL, Redis, or the API.
+
+To run the same demo locally:
 
 ```bash
 cd apps/web
@@ -124,6 +132,10 @@ Open `http://localhost:3000`, select **Commerce platform**, and ask:
 RepoLume will display the architecture graph, a grounded answer, and the source
 locations used to support it. The complete walkthrough is in the
 [demo script](docs/demo-script.md).
+
+The deployable public version uses this sample-first mode until the private
+analysis backend is hosted. See the
+[public demo deployment guide](docs/public-demo-deployment.md).
 
 ## Run it locally
 
@@ -195,16 +207,16 @@ For troubleshooting and shutdown commands, use the complete
 | API | Python 3.12, FastAPI, SQLAlchemy, Alembic |
 | Analysis | Python AST, Tree-sitter for TypeScript/JavaScript |
 | Data | PostgreSQL 17, Redis Streams |
-| Infrastructure | Docker Compose, GitHub Actions |
+| Infrastructure | Docker Compose, GitHub Actions, Cloudflare Workers |
 
 ## Quality and verification
 
-The current checkpoint passes **338 automated tests and live integration
+The current checkpoint passes **339 automated tests and live integration
 checks** across the three applications:
 
 - 145 API tests plus one live Redis integration test
 - 182 worker tests plus two live PostgreSQL/Redis integration tests
-- 8 rendered-page and route-level web tests
+- 9 rendered-page and route-level web tests
 - Ruff, ESLint, production builds, migration checks, and dependency audits in CI
 
 Verification screenshots and results are kept in
@@ -232,7 +244,8 @@ Supported source languages: **Python, TypeScript, and JavaScript**.
 - [x] Evidence-grounded repository questions
 - [x] Built-in sample repositories and demo path
 - [x] Real repository end-to-end verification
-- [ ] Hosted public deployment
+- [x] Hosted sample-first public demo
+- [ ] Hosted live-analysis backend
 - [ ] Maintainability and technical-debt insights
 - [ ] Security findings and dependency vulnerability data
 - [ ] Model-generated explanations and conversation history

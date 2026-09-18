@@ -508,3 +508,36 @@ grounded answer citing `src/itsdangerous/signer.py:15-28`.
 Browser verification found no console warnings, console errors, or framework
 error overlays. The production Vinext build, eight rendered and route-level
 tests, ESLint, API Ruff, and worker Ruff also passed.
+
+## Checkpoint 23
+
+Branch: `feature/public-demo-deployment`
+
+Captured: September 18, 2026
+
+### Public demo deployment readiness
+
+Command: `npm test` from `apps/web`
+
+Result: the production Vinext worker build completed and all nine rendered-page
+and route-level tests passed.
+
+Command: `npm run deploy:dry-run` from `apps/web`
+
+Result: Wrangler validated a 1,642.65 KiB upload bundle with 26 static assets
+and exited without publishing.
+
+Command: `npm run smoke -- http://localhost:3000` from `apps/web`
+
+Result: the page, `/api/health`, and the commerce sample all passed the live
+smoke test. ESLint and the production dependency audit also passed with zero
+vulnerabilities.
+
+Command: `npm run smoke -- https://repolume-web.sukhnoor-repolume.workers.dev`
+
+Result: the deployed Cloudflare Worker passed the same page, health, and sample
+checks over HTTPS. Deployment version `16cdbad2-c9a6-4287-a6dc-95719bc1288f`
+was published successfully.
+
+Test screenshots were intentionally omitted for this checkpoint. Verification
+is reproducible through the commands above and the manual deployment workflow.
