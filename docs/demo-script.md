@@ -1,23 +1,35 @@
-# RepoLume demo script
+# RepoLume demo video script
 
 This is the short version to use in a portfolio video, README walkthrough, or
 internship conversation.
 
+Live demo: <https://repolume-web.sukhnoor-repolume.workers.dev>
+
+## Before recording
+
+- Use a 1080p browser window at 100% zoom.
+- Close unrelated tabs, notifications, bookmarks, and personal account menus.
+- Open the live demo and refresh it before recording.
+- Keep the cursor still while speaking, then move deliberately.
+- Record one clean 60–75 second take before trying extra edits.
+
 ## 60-second walkthrough
 
-1. “RepoLume helps developers understand a codebase before they start changing
-   it.”
-2. Open the web app and click **Commerce platform** under the sample
-   repositories.
-3. “The sample loads instantly so reviewers can try the product without waiting
-   for a background worker.”
-4. Show the architecture map and click through a few nodes.
-5. “Each node keeps track of the files and relationships that explain why it is
-   on the map.”
-6. Ask: “How does an order get created?”
-7. Show the grounded answer and the source citations.
-8. “The goal is not just a pretty diagram. The useful part is connecting the
-   visual map to real source evidence.”
+| Time | Screen action | Voiceover |
+| --- | --- | --- |
+| 0–7s | Show the landing page and headline. | “RepoLume helps developers understand a codebase before they start changing it.” |
+| 7–16s | Point to public demo mode and select **Commerce platform**. | “The public demo uses built-in repositories, so anyone can try the full interaction without an account or a running backend.” |
+| 16–30s | Fit the graph and select `POST /orders`, `createOrder`, and Redis. | “RepoLume turns source analysis into an interactive architecture map with modules, entry points, symbols, dependencies, and confidence-labelled relationships.” |
+| 30–42s | Show the selected node’s source path and line range. | “Each useful node stays connected to its source location instead of becoming an unexplained diagram.” |
+| 42–55s | Ask **How does an order get created?** | “Repository questions are answered from ranked static-analysis evidence.” |
+| 55–67s | Hold on the answer and two citations. | “The answer cites the exact files and lines behind the claim, so a developer can verify it instead of trusting a guess.” |
+| 67–72s | Return to the graph or headline. | “The complete system also includes FastAPI, PostgreSQL, Redis, and a background analysis worker.” |
+
+## Short caption
+
+RepoLume turns unfamiliar repositories into interactive architecture maps and
+source-cited answers. Built with React, TypeScript, FastAPI, PostgreSQL, Redis,
+Python AST, and Tree-sitter.
 
 ## What to be honest about
 

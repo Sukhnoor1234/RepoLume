@@ -541,3 +541,39 @@ was published successfully.
 
 Test screenshots were intentionally omitted for this checkpoint. Verification
 is reproducible through the commands above and the manual deployment workflow.
+
+## Checkpoint 24
+
+Branch: `feature/portfolio-launch`
+
+Captured: September 18, 2026
+
+### Portfolio launch and security review
+
+Command: `npm test` from `apps/web`
+
+Result: the production Vinext worker build completed and all nine rendered-page
+and route-level tests passed, including the browser security-header checks.
+
+Command: `python -m pytest -p no:cacheprovider` from each Python application
+
+Result: 145 API tests and 182 worker tests passed. The three service-backed
+integration checks remain separated and were last verified in Checkpoint 22.
+
+Command: `npm audit --omit=dev` and `npm run deploy:dry-run` from `apps/web`
+
+Result: npm reported zero production vulnerabilities and Wrangler validated the
+production bundle without publishing it. ESLint also completed successfully.
+
+Command: `npm run smoke -- https://repolume-web.sukhnoor-repolume.workers.dev`
+
+Result: the redeployed Cloudflare Worker passed page, health, and sample checks.
+Deployment version `baab4d4d-8f95-48e6-8792-3aece08315e2` serves CSP, HSTS,
+anti-framing, MIME-sniffing, referrer, cross-origin, and browser-permission
+headers. A fresh browser walkthrough loaded the commerce graph and returned two
+source citations without console errors.
+
+The repository remained private during this review. GitHub Actions were limited
+to GitHub-owned actions pinned to immutable commits, workflow tokens remained
+read-only, and only the repository owner had collaborator access. Screenshots
+were intentionally omitted; the commands above are reproducible.

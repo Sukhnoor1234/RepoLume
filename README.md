@@ -109,7 +109,9 @@ apps/
 ```
 
 Architecture choices and tradeoffs are recorded as
-[architecture decision records](docs/decisions/).
+[architecture decision records](docs/decisions/). The
+[architecture overview](docs/architecture.md) explains the complete request,
+analysis, evidence, and deployment flows in one place.
 
 ## Try the 60-second demo
 
@@ -131,7 +133,7 @@ Open `http://localhost:3000`, select **Commerce platform**, and ask:
 
 RepoLume will display the architecture graph, a grounded answer, and the source
 locations used to support it. The complete walkthrough is in the
-[demo script](docs/demo-script.md).
+[demo video script](docs/demo-script.md).
 
 The deployable public version uses this sample-first mode until the private
 analysis backend is hosted. See the
@@ -256,6 +258,13 @@ Supported source languages: **Python, TypeScript, and JavaScript**.
 RepoLume is currently being built checkpoint by checkpoint. Feature branches,
 tests, and pull requests are required for changes. See
 [`CONTRIBUTING.md`](CONTRIBUTING.md) for the workflow.
+
+## Portfolio resources
+
+- [Architecture overview](docs/architecture.md)
+- [60-second demo video script](docs/demo-script.md)
+- [Résumé bullets and interview summary](docs/portfolio/project-summary.md)
+- [Security policy](SECURITY.md)
 
 ## License
 
