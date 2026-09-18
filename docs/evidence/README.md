@@ -462,3 +462,49 @@ route-level tests, ESLint, API Ruff, worker Ruff, and Docker Compose config
 validation. The production dependency audit was attempted, but the registry
 call did not return useful output before it was stopped; package files were not
 changed in this checkpoint.
+
+## Checkpoint 22
+
+Branch: `feature/local-e2e-verification`
+
+Captured: September 17, 2026
+
+### API pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/api`
+
+Result: 145 tests passed and one live integration test was deselected in 12.28
+seconds.
+
+Command: `python -m pytest -p no:cacheprovider -m integration` with the local
+Redis test URL configured
+
+Result: one live Redis integration test passed in 1.60 seconds.
+
+![Checkpoint 22 API pytest results](checkpoint-22-api-pytest.png)
+
+### Worker pytest
+
+Command: `python -m pytest -p no:cacheprovider` from `apps/worker`
+
+Result: 182 tests passed and two live integration tests were deselected in 6.76
+seconds.
+
+Command: `python -m pytest -p no:cacheprovider -m integration` with dedicated
+local PostgreSQL and Redis test URLs configured
+
+Result: two live service integration tests passed in 0.86 seconds.
+
+![Checkpoint 22 worker pytest results](checkpoint-22-worker-pytest.png)
+
+### Real repository flow
+
+The browser submitted `https://github.com/pallets/itsdangerous` through the
+live Vinext, FastAPI, PostgreSQL, Redis, and worker stack. The job reached
+`COMPLETED` and rendered an architecture with 79 nodes, 15 modules, 43 symbols,
+and 80 dependencies. The question “Where is signing implemented?” returned a
+grounded answer citing `src/itsdangerous/signer.py:15-28`.
+
+Browser verification found no console warnings, console errors, or framework
+error overlays. The production Vinext build, eight rendered and route-level
+tests, ESLint, API Ruff, and worker Ruff also passed.

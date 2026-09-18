@@ -92,8 +92,8 @@ function buildFlow(architecture: RepositoryArchitecture) {
   return { nodes, edges, truncated: architecture.nodes.length > nodes.length };
 }
 
-function countLabel(count: number, singular: string) {
-  return `${count} ${singular}${count === 1 ? "" : "s"}`;
+function countLabel(count: number, singular: string, plural = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 export default function ArchitectureExplorer({
@@ -127,7 +127,7 @@ export default function ArchitectureExplorer({
       <div className="explorer-summary" aria-label="Architecture summary">
         <span>{countLabel(architecture.summary.moduleCount, "module")}</span>
         <span>{countLabel(architecture.summary.symbolCount, "symbol")}</span>
-        <span>{countLabel(architecture.summary.dependencyCount, "dependency")}</span>
+        <span>{countLabel(architecture.summary.dependencyCount, "dependency", "dependencies")}</span>
         <span>{countLabel(architecture.summary.entryPointCount, "entry point")}</span>
       </div>
 

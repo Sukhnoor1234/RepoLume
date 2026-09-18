@@ -26,9 +26,10 @@ live FastAPI runtime is not configured.
 
 ## Configuration
 
-Set `REPOLUME_API_URL` on the web server to the FastAPI origin. For local
-development this is usually `http://127.0.0.1:8000`. The value remains
-server-side and is never included in the browser bundle.
+Copy `.dev.vars.example` to `.dev.vars` for local development. The example sets
+`REPOLUME_API_URL` to `http://localhost:8000`, and Vinext exposes that binding
+only to the local server runtime. The real `.dev.vars` file is ignored so
+future secrets cannot be committed accidentally.
 
 Without this setting, analysis requests fail closed with a safe service
 unavailable message. The transport boundary is documented in

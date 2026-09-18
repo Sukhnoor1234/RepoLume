@@ -75,11 +75,14 @@ class FakeRedis:
 
 def test_settings_redact_credentials_and_load_client() -> None:
     settings = WorkerQueueSettings(url="rediss://worker:secret@redis.example:6380/2?x=1")
+    connection_settings = create_redis_client(settings).connection_pool.connection_kwargs
 
     assert settings.safe_url == "rediss://worker:***@redis.example:6380/2"
     assert "secret" not in settings.safe_url
     assert "secret" not in repr(settings)
-    assert create_redis_client(settings).connection_pool.connection_kwargs["decode_responses"]
+    assert connection_settings["decode_responses"]
+    assert connection_settings["socket_connect_timeout"] == 5
+    assert connection_settings["socket_timeout"] == 65
 
 
 def test_settings_load_queue_values(monkeypatch: pytest.MonkeyPatch) -> None:

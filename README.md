@@ -86,9 +86,10 @@ npm install
 npm run dev
 ```
 
-Set `REPOLUME_API_URL` to the FastAPI origin to enable repository submission,
-status polling, completed architecture retrieval, evidence queries, and
-grounded answer summaries. Without it, the web boundary returns a safe
+Copy `apps/web/.dev.vars.example` to `apps/web/.dev.vars` to connect local web
+development to FastAPI. This enables repository submission, status polling,
+completed architecture retrieval, evidence queries, and grounded answer
+summaries. Without the binding, the web boundary returns a safe
 service-unavailable response.
 
 ## 60-second demo path
