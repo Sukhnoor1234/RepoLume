@@ -6,6 +6,7 @@ import type { FormEvent } from "react";
 import { parseRepositoryAnswer } from "@/app/lib/answer-contract";
 import type { RepositoryAnswerResult } from "@/app/lib/answer-contract";
 import type { EvidenceMatch } from "@/app/lib/evidence-contract";
+import { SAMPLE_REPOSITORIES } from "@/app/lib/sample-repositories";
 
 type ErrorEnvelope = { error: { message: string } };
 
@@ -28,6 +29,7 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const requestController = useRef<AbortController | null>(null);
+  const suggestedQuestion = SAMPLE_REPOSITORIES.find((sample) => sample.analysisId === analysisId)?.suggestedQuestion;
 
   useEffect(() => () => requestController.current?.abort(), []);
 
@@ -73,13 +75,12 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
   return (
     <section className="question-section" aria-labelledby="repository-question-heading">
       <div className="question-intro">
-        <span className="map-kicker">Repository questions</span>
-        <h2 id="repository-question-heading">Ask the architecture, inspect every claim.</h2>
+        <span className="section-label">GO ONE LEVEL DEEPER</span>
+        <h2 id="repository-question-heading">Ask your codebase.</h2>
         <p>
-          RepoLume composes a cautious answer from the completed architecture and keeps the
-          supporting files and line ranges attached.
+          Trace a feature back to the files behind it. Every supported answer includes source references.
         </p>
-        <span className="retrieval-note">Evidence-grounded answer · Static analysis</span>
+        <span className="retrieval-note">Based on static source evidence</span>
       </div>
 
       <div className="question-workspace">
@@ -100,6 +101,7 @@ export function RepositoryQuestionPanel({ analysisId }: { analysisId: string }) 
             </button>
           </div>
         </form>
+        {suggestedQuestion ? <button className="suggested-question" type="button" onClick={() => { setQuestion(suggestedQuestion); document.getElementById("repository-question")?.focus(); }}>Try asking: {suggestedQuestion} <span aria-hidden="true">↗</span></button> : null}
 
         <div className="evidence-results" aria-live="polite">
           {error ? (

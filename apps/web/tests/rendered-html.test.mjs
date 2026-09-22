@@ -30,13 +30,12 @@ test("server-renders the RepoLume analysis entry point", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>RepoLume — AI Architecture Explorer<\/title>/i);
-  assert.match(html, /Understand any codebase before you touch it\./);
-  assert.match(html, /AI architecture explorer/i);
-  assert.match(html, /commerce-platform/);
-  assert.match(html, /Public demo mode/);
-  assert.match(html, /Live analysis offline/);
-  assert.match(html, /Try a sample without waiting/);
-  assert.match(html, /examples include the architecture map and source-cited answers/i);
+  assert.match(html, /Get to know your codebase/);
+  assert.match(html, /Public demo/);
+  assert.match(html, /Local setup required/);
+  assert.match(html, /Explore a repository/);
+  assert.match(html, /Illustrative preview/);
+  assert.match(html, /Skip to workspace/);
   assert.match(html, /Commerce platform/);
   assert.match(html, /Task API/);
   assert.match(html, /How does an order get created\?/);

@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "RepoLume — AI Architecture Explorer",
   description:
     "Turn public repositories into interactive architecture maps and source-grounded answers.",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { Icon } from "@/app/components/brand";
 
 import { parseArchitecture } from "@/app/lib/architecture-contract";
 import type { RepositoryArchitecture } from "@/app/lib/architecture-contract";
@@ -153,16 +154,16 @@ export function RepositoryAnalyzer({
       error: null,
     });
 
-    async function loadArchitecture() {
+    async function loadArchitecture(analysisId: string) {
       try {
-        const response = await fetch(`/api/analyses/${currentAnalysisId}/architecture`, {
+        const response = await fetch(`/api/analyses/${analysisId}/architecture`, {
           cache: "no-store",
           signal: controller.signal,
         });
         const payload = await responsePayload(response);
         if (!response.ok) {
           onArchitectureChange({
-            analysisId: currentAnalysisId,
+            analysisId,
             architecture: null,
             loading: false,
             error:
@@ -174,7 +175,7 @@ export function RepositoryAnalyzer({
         const architecture = parseArchitecture(payload);
         if (!architecture) {
           onArchitectureChange({
-            analysisId: currentAnalysisId,
+            analysisId,
             architecture: null,
             loading: false,
             error: "RepoLume received an invalid architecture response.",
@@ -182,7 +183,7 @@ export function RepositoryAnalyzer({
           return;
         }
         onArchitectureChange({
-          analysisId: currentAnalysisId,
+          analysisId,
           architecture,
           loading: false,
           error: null,
@@ -190,7 +191,7 @@ export function RepositoryAnalyzer({
       } catch {
         if (!controller.signal.aborted) {
           onArchitectureChange({
-            analysisId: currentAnalysisId,
+            analysisId,
             architecture: null,
             loading: false,
             error: "RepoLume could not reach the architecture service.",
@@ -199,7 +200,7 @@ export function RepositoryAnalyzer({
       }
     }
 
-    void loadArchitecture();
+    void loadArchitecture(currentAnalysisId);
     return () => controller.abort();
   }, [currentAnalysisId, currentStatus, onArchitectureChange, resultAvailable]);
 
@@ -273,13 +274,29 @@ export function RepositoryAnalyzer({
 
   return (
     <div className="repository-preview" aria-label="Repository analyzer">
-      {!liveAnalysisEnabled ? (
-        <div className="demo-mode-note" role="status">
-          <strong>Public demo mode</strong>
-          <span>Choose a sample below to explore RepoLume without waiting.</span>
+      <div className="repository-section-heading">
+        <div><span className="section-label">01 / CHOOSE YOUR STARTING POINT</span><h2>Explore a repository</h2></div>
+        <span className="sample-access-note">No account needed</span>
+      </div>
+      <div className="sample-repositories" aria-label="Sample repositories">
+        <div>
+          {SAMPLE_REPOSITORIES.map((sample) => (
+            <button key={sample.analysisId} type="button" aria-pressed={currentAnalysisId === sample.analysisId} onClick={() => loadSample(sample)}>
+              <span className={`sample-icon language-${sample.language.toLowerCase()}`}><Icon name="folder" /></span>
+              <span className="sample-copy">
+                <span className="sample-title"><strong>{sample.name}</strong><small>{sample.language}</small></span>
+                <span className="sample-description">{sample.description}</span>
+                <span className="sample-question">{sample.suggestedQuestion}</span>
+              </span>
+              <Icon name="arrow" />
+            </button>
+          ))}
         </div>
-      ) : null}
-      <form onSubmit={submit}>
+      </div>
+      <details className="repository-import" open={liveAnalysisEnabled ? true : undefined}>
+        <summary><Icon name="code" />Bring your own repository<span>{liveAnalysisEnabled ? "Available" : "Local setup required"}</span></summary>
+        {!liveAnalysisEnabled ? <p className="demo-mode-note">The public demo uses curated examples. To analyse your own repository, <a href="https://github.com/Sukhnoor1234/RepoLume#run-it-locally" target="_blank" rel="noreferrer">run RepoLume locally <Icon name="external" /></a>.</p> : null}
+        <form onSubmit={submit}>
         <label htmlFor="repository-url">Public GitHub repository</label>
         <div className="repository-controls">
           <input
@@ -300,7 +317,7 @@ export function RepositoryAnalyzer({
               ? "Starting…"
               : liveAnalysisEnabled
                 ? "Analyze repository"
-                : "Live analysis offline"}
+                : "Available locally"}
           </button>
         </div>
         <p id="repository-note">
@@ -309,42 +326,20 @@ export function RepositoryAnalyzer({
             : "The hosted demo uses built-in samples. The full repository flow is verified locally."}
         </p>
       </form>
-
-      <div className="sample-repositories" aria-label="Sample repositories">
-        <span>Try a sample without waiting</span>
-        <p>
-          {liveAnalysisEnabled
-            ? "Good for a quick walkthrough without waiting for a new analysis."
-            : "These examples include the architecture map and source-cited answers."}
-        </p>
-        <div>
-          {SAMPLE_REPOSITORIES.map((sample) => (
-            <button key={sample.analysisId} type="button" onClick={() => loadSample(sample)}>
-              <span>
-                <strong>{sample.name}</strong>
-                <small>{sample.language}</small>
-              </span>
-              <em>{sample.description}</em>
-              <span className="sample-question">Ask: {sample.suggestedQuestion}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      </details>
 
       <div id="repository-feedback" className="analysis-feedback" aria-live="polite">
-        {analysis ? (
+        {analysis && analysis.status !== "completed" ? (
           <div className={`analysis-progress status-${analysis.status}`}>
             <div>
               <span className="analysis-progress-label">{STATUS_LABELS[analysis.status]}</span>
               <code>{analysis.analysisId}</code>
             </div>
             <span className="analysis-progress-status">{analysis.status}</span>
-            {analysis.status === "completed" && analysis.resultAvailable ? (
-              <p>Your architecture is ready in the explorer.</p>
-            ) : null}
             {analysis.failure ? <p>{analysis.failure.message}</p> : null}
           </div>
         ) : null}
+        {analysis?.status === "completed" ? <p className="sr-only">{analysis.resultAvailable ? "Architecture ready. Explore the map below." : "Analysis completed without an architecture result."}</p> : null}
         {notice ? <p className="analysis-notice" role="alert">{notice}</p> : null}
       </div>
     </div>

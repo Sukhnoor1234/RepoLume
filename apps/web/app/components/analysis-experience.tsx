@@ -24,35 +24,26 @@ export function AnalysisExperience({ liveAnalysisEnabled }: AnalysisExperiencePr
 
   return (
     <>
-      <section className="hero">
-        <div className="hero-copy">
-          <div className="eyebrow">
-            <span className="status-dot" aria-hidden="true" />
-            AI architecture explorer
-          </div>
-          <h1>Understand any codebase before you touch it.</h1>
+      <section className="workspace-intro">
+        <div>
+          <span className="section-label">THE BIG PICTURE, IN FOCUS</span>
+          <h1>Get to know your codebase<span>.</span></h1>
           <p className="hero-description">
-            RepoLume turns public repositories into interactive architecture maps,
-            then helps you trace systems and ask questions with answers grounded
-            in the source code.
+            Explore the structure. Follow the connections. Find where things happen.
           </p>
-
-          <RepositoryAnalyzer
-            liveAnalysisEnabled={liveAnalysisEnabled}
-            onArchitectureChange={updateDisplay}
-          />
-
-          <div className="hero-details" aria-label="Initial product scope">
-            <span>TypeScript</span>
-            <span>Python</span>
-            <span>Source-linked answers</span>
-          </div>
         </div>
+        <span className="intro-note">Less searching.<br />More understanding.</span>
+      </section>
+      <section className="exploration-workspace" aria-label="Repository workspace">
+        <RepositoryAnalyzer
+          liveAnalysisEnabled={liveAnalysisEnabled}
+          onArchitectureChange={updateDisplay}
+        />
 
         <ArchitecturePanel display={display} />
       </section>
       {display.analysisId && display.architecture ? (
-        <RepositoryQuestionPanel analysisId={display.analysisId} />
+        <RepositoryQuestionPanel analysisId={display.analysisId} key={display.analysisId} />
       ) : null}
     </>
   );
