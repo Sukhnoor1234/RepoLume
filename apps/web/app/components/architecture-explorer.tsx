@@ -85,7 +85,7 @@ function buildFlow(architecture: RepositoryArchitecture) {
       label: edge.kind === "depends_on" ? "depends" : undefined,
       markerEnd: { type: MarkerType.ArrowClosed },
       style: {
-        stroke: edge.confidence === "confirmed" ? "#53d6e8" : "#f1bd70",
+        stroke: edge.confidence === "confirmed" ? "#77857b" : "#b97843",
         strokeDasharray: edge.confidence === "heuristic" ? "6 5" : undefined,
       },
     }));
@@ -118,8 +118,8 @@ export default function ArchitectureExplorer({
     <>
       <div className="map-header explorer-header">
         <div>
-          <span className="map-kicker">Live architecture</span>
-          <h2>{architecture.languages.join(" + ") || "Repository graph"}</h2>
+          <span className="map-kicker">Architecture map</span>
+          <h2>{architecture.nodes.find((node) => node.kind === "repository")?.name ?? "Repository graph"}</h2>
         </div>
         <span className="analysis-status">{architecture.summary.nodeCount} nodes</span>
       </div>
@@ -146,15 +146,16 @@ export default function ArchitectureExplorer({
             fitViewOptions={{ padding: 0.18, maxZoom: 1.15 }}
             minZoom={0.12}
             maxZoom={1.8}
-            colorMode="dark"
+            colorMode="light"
             proOptions={{ hideAttribution: true }}
           >
-            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#284454" />
-            <MiniMap
+            <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#d4d6cd" />
+            <MiniMap<ExplorerFlowNode>
+              style={{ width: 100, height: 70 }}
               pannable
               zoomable
               nodeColor={(node) =>
-                node.data?.architectureNode.kind === "external_dependency" ? "#f1bd70" : "#53d6e8"
+                node.data?.architectureNode.kind === "external_dependency" ? "#bd8056" : "#789887"
               }
             />
             <Controls showInteractive={false} />
@@ -199,6 +200,7 @@ export default function ArchitectureExplorer({
           ) : null}
         </aside>
       </div>
+      <div className="map-footer"><span><i className="legend-dot confirmed" />Confirmed</span><span><i className="legend-dot inferred" />Inferred</span><span className="map-footer-note">Select a node to inspect · Scroll to zoom</span></div>
     </>
   );
 }

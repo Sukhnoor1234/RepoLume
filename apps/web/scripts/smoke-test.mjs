@@ -30,8 +30,8 @@ if (!deploymentValue) {
     const pageResponse = await request("/");
     assert.equal(pageResponse.status, 200, "The public page should return HTTP 200.");
     const page = await pageResponse.text();
-    assert.match(page, /Understand any codebase before you touch it\./);
-    assert.match(page, /Try a sample without waiting/);
+    assert.match(page, /Get to know your codebase/);
+    assert.match(page, /Explore a repository/);
 
     const healthResponse = await request("/api/health");
     assert.equal(healthResponse.status, 200, "The web health endpoint should return HTTP 200.");
